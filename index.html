@@ -1,10 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="ky">
 <head>
 <meta charset="UTF-8">
-<title>Магазин</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Магазин Системасы</title>
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background: linear-gradient(135deg,#4e73df,#1cc88a);
+    color:white;
+}
+header{
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+}
+nav{
+    display:flex;
+    justify-content:space-around;
+    background:rgba(0,0,0,0.2);
+    padding:10px;
+}
+nav button{
+    background:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+}
+section{
+    display:none;
+    padding:20px;
+}
+.active{
+    display:block;
+}
+.card{
+    background:white;
+    color:black;
+    padding:10px;
+    margin:10px 0;
+    border-radius:8px;
+}
+</style>
 </head>
+
 <body>
-<h1>Магазин иштеп жатат</h1>
-</body><link rel="manifest" href="manifest.json">
-</html><link rel="manifest" href="manifest.json">
+
+<header>🏪 Магазин Системасы</header>
+
+<nav>
+<button onclick="showSection('home')">Башкы</button>
+<button onclick="showSection('products')">Товарлар</button>
+<button onclick="showSection('cash')">Касса</button>
+<button onclick="showSection('admin')">Админ</button>
+</nav>
+
+<section id="home" class="active">
+<h2>Кош келиңиз!</h2>
+<p>Бул заманбап магазин системасы.</p>
+</section>
+
+<section id="products">
+<h2>Товарлар</h2>
+<div id="productList"></div>
+</section>
+
+<section id="cash">
+<h2>Касса</h2>
+<p>Жалпы сумма: <span id="total">0</span> сом</p>
+</section>
+
+<section id="admin">
+<h2>Админ</h2>
+<p>Бул бөлүмдө кийин товар кошобуз.</p>
+</section>
+
+<script>
+function showSection(id){
+ document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+}
+</script>
+
+</body>
+</html>
