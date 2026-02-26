@@ -3,69 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Магазин Системасы</title>
+<title>Магазин Касса</title>
 
 <style>
 body{
-    margin:0;
-    font-family:Arial;
-    background:linear-gradient(135deg,#6a11cb,#2575fc);
-    color:white;
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#00c6ff,#0072ff);
+color:white;
 }
 header{
-    text-align:center;
-    padding:15px;
-    font-size:22px;
-    font-weight:bold;
+text-align:center;
+padding:15px;
+font-size:22px;
+font-weight:bold;
 }
 nav{
-    display:flex;
-    justify-content:space-around;
-    background:rgba(0,0,0,0.2);
-    padding:10px;
+display:flex;
+justify-content:space-around;
+background:rgba(0,0,0,0.2);
+padding:10px;
 }
 nav button{
-    padding:8px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
+padding:8px;
+border:none;
+border-radius:6px;
+cursor:pointer;
 }
 section{display:none;padding:20px;}
 .active{display:block;}
 .card{
-    background:white;
-    color:black;
-    padding:10px;
-    margin:8px 0;
-    border-radius:8px;
+background:white;
+color:black;
+padding:10px;
+margin:8px 0;
+border-radius:8px;
 }
 input{
-    width:100%;
-    padding:8px;
-    margin:5px 0;
+width:100%;
+padding:8px;
+margin:5px 0;
 }
 button{
-    cursor:pointer;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<header>🏪 Магазин</header>
+<header>🏪 Телефон Касса</header>
 
 <nav>
-<button onclick="show('home')">Башкы</button>
 <button onclick="show('products')">Товар</button>
 <button onclick="show('cash')">Касса</button>
 </nav>
 
-<section id="home" class="active">
-<h2>Система иштеп жатат ✅</h2>
-</section>
-
-<section id="products">
-<h2>Товар кошуу</h2>
+<section id="products" class="active">
+<h3>Товар кошуу</h3>
 <input type="text" id="name" placeholder="Аты">
 <input type="number" id="price" placeholder="Баасы">
 <input type="number" id="qty" placeholder="Саны">
@@ -74,65 +69,64 @@ button{
 </section>
 
 <section id="cash">
-<h2>Жалпы сумма</h2>
-<h3>💰 <span id="total">0</span> сом</h3>
+<h3>💰 Жалпы сумма: <span id="total">0</span> сом</h3>
 </section>
 
 <script>
 let products = JSON.parse(localStorage.getItem("products")) || [];
 
 function show(id){
- document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
- document.getElementById(id).classList.add("active");
+document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+document.getElementById(id).classList.add("active");
 }
 
 function save(){
- localStorage.setItem("products",JSON.stringify(products));
+localStorage.setItem("products",JSON.stringify(products));
 }
 
 function add(){
- let name=document.getElementById("name").value;
- let price=Number(document.getElementById("price").value);
- let qty=Number(document.getElementById("qty").value);
- if(!name) return;
+let name=document.getElementById("name").value;
+let price=Number(document.getElementById("price").value);
+let qty=Number(document.getElementById("qty").value);
+if(!name) return;
 
- products.push({name,price,qty});
- save();
- render();
+products.push({name,price,qty});
+save();
+render();
 }
 
 function render(){
- let list=document.getElementById("list");
- list.innerHTML="";
- let total=0;
+let list=document.getElementById("list");
+list.innerHTML="";
+let total=0;
 
- products.forEach((p,i)=>{
-   total+=p.price*p.qty;
-   list.innerHTML+=`
-   <div class="card">
-   <b>${p.name}</b><br>
-   ${p.price} сом × ${p.qty}<br>
-   <button onclick="sell(${i})">Сатуу</button>
-   <button onclick="remove(${i})">Өчүрүү</button>
-   </div>
-   `;
- });
+products.forEach((p,i)=>{
+total+=p.price*p.qty;
+list.innerHTML+=`
+<div class="card">
+<b>${p.name}</b><br>
+${p.price} сом × ${p.qty}<br>
+<button onclick="sell(${i})">Сатуу</button>
+<button onclick="remove(${i})">Өчүрүү</button>
+</div>
+`;
+});
 
- document.getElementById("total").innerText=total;
+document.getElementById("total").innerText=total;
 }
 
 function sell(i){
- if(products[i].qty>0){
-   products[i].qty--;
-   save();
-   render();
- }
+if(products[i].qty>0){
+products[i].qty--;
+save();
+render();
+}
 }
 
 function remove(i){
- products.splice(i,1);
- save();
- render();
+products.splice(i,1);
+save();
+render();
 }
 
 render();
