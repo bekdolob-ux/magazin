@@ -3,133 +3,186 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Магазин Касса</title>
+<title>Фирма МПА</title>
 
 <style>
 body{
 margin:0;
 font-family:Arial;
-background:linear-gradient(135deg,#00c6ff,#0072ff);
-color:white;
+background:#0d47a1; /* көк фон */
+color:#000; /* кара текст */
 }
+
 header{
-text-align:center;
+background:white;
 padding:15px;
-font-size:22px;
+text-align:center;
+position:relative;
+}
+
+.logo-circle{
+width:40px;
+height:40px;
+border-radius:50%;
+background:linear-gradient(135deg, red 50%, black 50%);
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-weight:bold;
+position:absolute;
+left:15px;
+top:10px;
+}
+
+.title{
+font-size:28px;
 font-weight:bold;
 }
-nav{
-display:flex;
-justify-content:space-around;
-background:rgba(0,0,0,0.2);
-padding:10px;
+
+.subtitle{
+font-size:14px;
 }
-nav button{
-padding:8px;
-border:none;
-border-radius:6px;
+
+.menu{
+position:absolute;
+right:15px;
+top:15px;
+font-size:24px;
 cursor:pointer;
 }
-section{display:none;padding:20px;}
-.active{display:block;}
-.card{
+
+nav{
+display:none;
+flex-direction:column;
 background:white;
-color:black;
 padding:10px;
-margin:8px 0;
+}
+
+nav button{
+margin:5px 0;
+padding:10px;
+border:none;
+background:#e0e0e0;
+cursor:pointer;
+}
+
+section{
+display:none;
+padding:15px;
+background:white;
+margin:10px;
 border-radius:8px;
 }
+
+.active{display:block;}
+
 input{
 width:100%;
 padding:8px;
 margin:5px 0;
 }
-button{
+
+button.action{
+background:#1b5e20;
+color:white;
+padding:10px;
+border:none;
+width:100%;
 cursor:pointer;
+margin-top:5px;
 }
 </style>
 </head>
 
 <body>
 
-<header>🏪 Телефон Касса</header>
+<header>
+<div class="logo-circle">M</div>
 
-<nav>
-<button onclick="show('products')">Товар</button>
-<button onclick="show('cash')">Касса</button>
+<div class="title">МПА</div>
+<div class="subtitle">Фирма</div>
+
+<div class="menu" onclick="toggleMenu()">☰</div>
+</header>
+
+<nav id="menu">
+<button onclick="show('add')">⛽ Алды</button>
+<button onclick="show('sell')">🛢 Сатты</button>
+<button onclick="show('report')">📊 Отчет</button>
 </nav>
 
-<section id="products" class="active">
-<h3>Товар кошуу</h3>
-<input type="text" id="name" placeholder="Аты">
-<input type="number" id="price" placeholder="Баасы">
-<input type="number" id="qty" placeholder="Саны">
-<button onclick="add()">Кошуу</button>
-<div id="list"></div>
+<section id="add" class="active">
+<h3>Дизель Алды</h3>
+<input type="number" id="buyLiters" placeholder="Литр">
+<input type="number" id="buyPrice" placeholder="Баасы">
+<button class="action" onclick="addFuel()">Кошуу</button>
 </section>
 
-<section id="cash">
-<h3>💰 Жалпы сумма: <span id="total">0</span> сом</h3>
+<section id="sell">
+<h3>Дизель Сатты</h3>
+<input type="number" id="sellLiters" placeholder="Литр">
+<input type="number" id="sellPrice" placeholder="Баасы">
+<button class="action" onclick="sellFuel()">Сатуу</button>
+</section>
+
+<section id="report">
+<h3>📊 Жалпы</h3>
+<p>Жалпы Алынган: <span id="totalBuy">0</span> сом</p>
+<p>Жалпы Сатылган: <span id="totalSell">0</span> сом</p>
+<p>Баланс: <span id="balance">0</span> сом</p>
 </section>
 
 <script>
-let products = JSON.parse(localStorage.getItem("products")) || [];
+
+let totalBuy = Number(localStorage.getItem("totalBuy")) || 0;
+let totalSell = Number(localStorage.getItem("totalSell")) || 0;
+
+function save(){
+localStorage.setItem("totalBuy",totalBuy);
+localStorage.setItem("totalSell",totalSell);
+}
+
+function updateReport(){
+document.getElementById("totalBuy").innerText = totalBuy;
+document.getElementById("totalSell").innerText = totalSell;
+document.getElementById("balance").innerText = totalSell - totalBuy;
+}
+
+function addFuel(){
+let liters = Number(document.getElementById("buyLiters").value);
+let price = Number(document.getElementById("buyPrice").value);
+if(liters && price){
+totalBuy += liters * price;
+save();
+updateReport();
+alert("Кошулду!");
+}
+}
+
+function sellFuel(){
+let liters = Number(document.getElementById("sellLiters").value);
+let price = Number(document.getElementById("sellPrice").value);
+if(liters && price){
+totalSell += liters * price;
+save();
+updateReport();
+alert("Сатылды!");
+}
+}
 
 function show(id){
 document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
 document.getElementById(id).classList.add("active");
 }
 
-function save(){
-localStorage.setItem("products",JSON.stringify(products));
+function toggleMenu(){
+let m = document.getElementById("menu");
+m.style.display = (m.style.display === "flex") ? "none" : "flex";
 }
 
-function add(){
-let name=document.getElementById("name").value;
-let price=Number(document.getElementById("price").value);
-let qty=Number(document.getElementById("qty").value);
-if(!name) return;
+updateReport();
 
-products.push({name,price,qty});
-save();
-render();
-}
-
-function render(){
-let list=document.getElementById("list");
-list.innerHTML="";
-let total=0;
-
-products.forEach((p,i)=>{
-total+=p.price*p.qty;
-list.innerHTML+=`
-<div class="card">
-<b>${p.name}</b><br>
-${p.price} сом × ${p.qty}<br>
-<button onclick="sell(${i})">Сатуу</button>
-<button onclick="remove(${i})">Өчүрүү</button>
-</div>
-`;
-});
-
-document.getElementById("total").innerText=total;
-}
-
-function sell(i){
-if(products[i].qty>0){
-products[i].qty--;
-save();
-render();
-}
-}
-
-function remove(i){
-products.splice(i,1);
-save();
-render();
-}
-
-render();
 </script>
 
 </body>
