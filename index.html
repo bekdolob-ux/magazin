@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Магазин Системасы</title>
 
-<link rel="manifest" href="manifest.json">
-
 <style>
 body{
     margin:0;
@@ -14,18 +12,21 @@ body{
     background: linear-gradient(135deg,#4e73df,#1cc88a);
     color:white;
 }
+
 header{
     padding:15px;
     text-align:center;
     font-size:22px;
     font-weight:bold;
 }
+
 nav{
     display:flex;
     justify-content:space-around;
     background:rgba(0,0,0,0.2);
     padding:10px;
 }
+
 nav button{
     background:white;
     border:none;
@@ -33,19 +34,38 @@ nav button{
     border-radius:8px;
     cursor:pointer;
 }
+
 section{
     display:none;
     padding:20px;
 }
+
 .active{
     display:block;
 }
+
 .card{
     background:white;
     color:black;
     padding:10px;
     margin:10px 0;
     border-radius:8px;
+}
+
+input{
+    padding:8px;
+    margin:5px 0;
+    width:100%;
+}
+
+button.add{
+    background:#1cc88a;
+    color:white;
+    border:none;
+    padding:8px;
+    border-radius:8px;
+    cursor:pointer;
+    width:100%;
 }
 </style>
 </head>
@@ -55,37 +75,84 @@ section{
 <header>🏪 Магазин Системасы</header>
 
 <nav>
-<button onclick="showSection('home')">Башкы</button>
-<button onclick="showSection('products')">Товарлар</button>
-<button onclick="showSection('cash')">Касса</button>
-<button onclick="showSection('admin')">Админ</button>
+<button onclick="show('home')">Башкы</button>
+<button onclick="show('products')">Товарлар</button>
+<button onclick="show('cash')">Касса</button>
 </nav>
 
 <section id="home" class="active">
 <h2>Кош келиңиз!</h2>
-<p>Бул заманбап магазин системасы.</p>
+<p>Заманавай магазин системасы.</p>
 </section>
 
 <section id="products">
-<h2>Товарлар</h2>
-<div id="productList"></div>
+<h2>Товар кошуу</h2>
+
+<input type="text" id="name" placeholder="Товар аты">
+<input type="number" id="price" placeholder="Баасы">
+<input type="number" id="qty" placeholder="Саны">
+<button class="add" onclick="addProduct()">Кошуу</button>
+
+<div id="list"></div>
 </section>
 
 <section id="cash">
-<h2>Касса</h2>
-<p>Жалпы сумма: <span id="total">0</span> сом</p>
-</section>
-
-<section id="admin">
-<h2>Админ</h2>
-<p>Бул бөлүмдө кийин товар кошобуз.</p>
+<h2>Жалпы сумма</h2>
+<p>Сумма: <span id="total">0</span> сом</p>
 </section>
 
 <script>
-function showSection(id){
+let products = JSON.parse(localStorage.getItem("products")) || [];
+
+function show(id){
  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
  document.getElementById(id).classList.add("active");
 }
+
+function save(){
+ localStorage.setItem("products", JSON.stringify(products));
+}
+
+function addProduct(){
+ let name = document.getElementById("name").value;
+ let price = Number(document.getElementById("price").value);
+ let qty = Number(document.getElementById("qty").value);
+
+ if(name=="") return;
+
+ products.push({name, price, qty});
+ save();
+ render();
+}
+
+function render(){
+ let list = document.getElementById("list");
+ list.innerHTML="";
+ let total=0;
+
+ products.forEach((p,index)=>{
+   total += p.price * p.qty;
+
+   list.innerHTML += `
+   <div class="card">
+   <b>${p.name}</b><br>
+   Баасы: ${p.price} сом<br>
+   Саны: ${p.qty}<br>
+   <button onclick="deleteProduct(${index})">Өчүрүү</button>
+   </div>
+   `;
+ });
+
+ document.getElementById("total").innerText = total;
+}
+
+function deleteProduct(index){
+ products.splice(index,1);
+ save();
+ render();
+}
+
+render();
 </script>
 
 </body>
