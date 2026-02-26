@@ -8,97 +8,74 @@
 <style>
 body{
     margin:0;
-    font-family:Arial, sans-serif;
-    background: linear-gradient(135deg,#4e73df,#1cc88a);
+    font-family:Arial;
+    background:linear-gradient(135deg,#6a11cb,#2575fc);
     color:white;
 }
-
 header{
-    padding:15px;
     text-align:center;
+    padding:15px;
     font-size:22px;
     font-weight:bold;
 }
-
 nav{
     display:flex;
     justify-content:space-around;
     background:rgba(0,0,0,0.2);
     padding:10px;
 }
-
 nav button{
-    background:white;
+    padding:8px;
     border:none;
-    padding:8px 12px;
-    border-radius:8px;
+    border-radius:6px;
     cursor:pointer;
 }
-
-section{
-    display:none;
-    padding:20px;
-}
-
-.active{
-    display:block;
-}
-
+section{display:none;padding:20px;}
+.active{display:block;}
 .card{
     background:white;
     color:black;
     padding:10px;
-    margin:10px 0;
+    margin:8px 0;
     border-radius:8px;
 }
-
 input{
+    width:100%;
     padding:8px;
     margin:5px 0;
-    width:100%;
 }
-
-button.add{
-    background:#1cc88a;
-    color:white;
-    border:none;
-    padding:8px;
-    border-radius:8px;
+button{
     cursor:pointer;
-    width:100%;
 }
 </style>
 </head>
 
 <body>
 
-<header>🏪 Магазин Системасы</header>
+<header>🏪 Магазин</header>
 
 <nav>
 <button onclick="show('home')">Башкы</button>
-<button onclick="show('products')">Товарлар</button>
+<button onclick="show('products')">Товар</button>
 <button onclick="show('cash')">Касса</button>
 </nav>
 
 <section id="home" class="active">
-<h2>Кош келиңиз!</h2>
-<p>Заманавай магазин системасы.</p>
+<h2>Система иштеп жатат ✅</h2>
 </section>
 
 <section id="products">
 <h2>Товар кошуу</h2>
-
-<input type="text" id="name" placeholder="Товар аты">
+<input type="text" id="name" placeholder="Аты">
 <input type="number" id="price" placeholder="Баасы">
 <input type="number" id="qty" placeholder="Саны">
-<button class="add" onclick="addProduct()">Кошуу</button>
-
+<button onclick="add()">Кошуу</button>
 <div id="list"></div>
 </section>
 
 <section id="cash">
 <h2>Жалпы сумма</h2>
-<p>Сумма: <span id="total">0</span> сом</p>
+<h3>💰 <span id="total">0</span> сом</h3>
 </section>
 
 <script>
@@ -110,44 +87,50 @@ function show(id){
 }
 
 function save(){
- localStorage.setItem("products", JSON.stringify(products));
+ localStorage.setItem("products",JSON.stringify(products));
 }
 
-function addProduct(){
- let name = document.getElementById("name").value;
- let price = Number(document.getElementById("price").value);
- let qty = Number(document.getElementById("qty").value);
+function add(){
+ let name=document.getElementById("name").value;
+ let price=Number(document.getElementById("price").value);
+ let qty=Number(document.getElementById("qty").value);
+ if(!name) return;
 
- if(name=="") return;
-
- products.push({name, price, qty});
+ products.push({name,price,qty});
  save();
  render();
 }
 
 function render(){
- let list = document.getElementById("list");
+ let list=document.getElementById("list");
  list.innerHTML="";
  let total=0;
 
- products.forEach((p,index)=>{
-   total += p.price * p.qty;
-
-   list.innerHTML += `
+ products.forEach((p,i)=>{
+   total+=p.price*p.qty;
+   list.innerHTML+=`
    <div class="card">
    <b>${p.name}</b><br>
-   Баасы: ${p.price} сом<br>
-   Саны: ${p.qty}<br>
-   <button onclick="deleteProduct(${index})">Өчүрүү</button>
+   ${p.price} сом × ${p.qty}<br>
+   <button onclick="sell(${i})">Сатуу</button>
+   <button onclick="remove(${i})">Өчүрүү</button>
    </div>
    `;
  });
 
- document.getElementById("total").innerText = total;
+ document.getElementById("total").innerText=total;
 }
 
-function deleteProduct(index){
- products.splice(index,1);
+function sell(i){
+ if(products[i].qty>0){
+   products[i].qty--;
+   save();
+   render();
+ }
+}
+
+function remove(i){
+ products.splice(i,1);
  save();
  render();
 }
