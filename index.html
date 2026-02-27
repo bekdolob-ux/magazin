@@ -43,7 +43,7 @@ th,td{border:1px solid #ccc;padding:5px;text-align:center;}
 </div>
 
 <div class="card">
-<h3>📄 Операциялар Тизмеси</h3>
+<h3>📄 Операциялар</h3>
 <table>
 <thead>
 <tr>
@@ -51,6 +51,7 @@ th,td{border:1px solid #ccc;padding:5px;text-align:center;}
 <th>Түрү</th>
 <th>Литр</th>
 <th>Сумма</th>
+<th>❌</th>
 </tr>
 </thead>
 <tbody id="tableBody"></tbody>
@@ -58,6 +59,7 @@ th,td{border:1px solid #ccc;padding:5px;text-align:center;}
 </div>
 
 <script>
+
 let data=JSON.parse(localStorage.getItem("data"))||[];
 let chart;
 
@@ -66,9 +68,15 @@ localStorage.setItem("data",JSON.stringify(data));
 }
 
 function addOperation(){
+
 let type=document.getElementById("type").value;
 let liters=Number(document.getElementById("liters").value);
 let price=Number(document.getElementById("price").value);
+
+if(!liters || !price){
+alert("Маалымат толтуруңуз!");
+return;
+}
 
 data.push({
 type,
@@ -77,22 +85,39 @@ price,
 date:new Date().toLocaleString()
 });
 
+document.getElementById("liters").value="";
+document.getElementById("price").value="";
+
+save();
+calculate();
+}
+
+function deleteItem(index){
+data.splice(index,1);
 save();
 calculate();
 }
 
 function calculate(){
+
 let balance=0;
-let buys=0,sells=0;
+let buys=0;
+let sells=0;
 
 let table=document.getElementById("tableBody");
 table.innerHTML="";
 
-data.forEach(o=>{
+data.forEach((o,index)=>{
 let total=o.liters*o.price;
 
-if(o.type==="buy"){balance-=total;buys+=total;}
-if(o.type==="sell"){balance+=total;sells+=total;}
+if(o.type==="buy"){
+balance-=total;
+buys+=total;
+}
+if(o.type==="sell"){
+balance+=total;
+sells+=total;
+}
 
 table.innerHTML+=`
 <tr>
@@ -100,6 +125,7 @@ table.innerHTML+=`
 <td>${o.type==="buy"?"Алды":"Сатты"}</td>
 <td>${o.liters}</td>
 <td>${total}</td>
+<td><button onclick="deleteItem(${index})">❌</button></td>
 </tr>
 `;
 });
@@ -107,11 +133,15 @@ table.innerHTML+=`
 document.getElementById("balance").innerText=balance;
 
 if(chart) chart.destroy();
+
 chart=new Chart(document.getElementById("chart"),{
 type:"bar",
 data:{
 labels:["Алды","Сатты"],
-datasets:[{label:"Сумма",data:[buys,sells]}]
+datasets:[{
+label:"Сумма",
+data:[buys,sells]
+}]
 }
 });
 }
@@ -121,6 +151,7 @@ document.body.classList.toggle("dark");
 }
 
 calculate();
+
 </script>
 
 </body>
