@@ -3,56 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Фирма МПА</title>
+<title>MPA Business System</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+:root{
+ --bg:#0d47a1;
+ --card:#ffffff;
+ --text:#000;
+}
+
+body.dark{
+ --bg:#0f172a;
+ --card:#1e293b;
+ --text:#fff;
+}
+
 body{
 margin:0;
 font-family:Arial;
-background:#0d47a1;
-color:white;
+background:var(--bg);
+color:var(--text);
 }
 
 header{
 background:#081c3a;
+color:white;
 padding:15px;
 display:flex;
 justify-content:space-between;
 align-items:center;
 }
 
-.logo{
-font-size:22px;
-font-weight:bold;
-color:white;
-}
-
-.menu-btn{
-font-size:24px;
+button{
 cursor:pointer;
 }
 
 nav{
 display:none;
 flex-direction:column;
-background:white;
-color:black;
+background:var(--card);
 padding:10px;
 }
 
 nav button{
 margin:5px 0;
 padding:8px;
-cursor:pointer;
 }
 
 section{
 display:none;
 padding:15px;
-background:white;
-color:black;
+background:var(--card);
 margin:10px;
 border-radius:8px;
+color:var(--text);
 }
 
 .active{display:block;}
@@ -63,18 +69,13 @@ padding:8px;
 margin:5px 0;
 }
 
-button{
-padding:8px;
-cursor:pointer;
-}
-
 table{
 width:100%;
 border-collapse:collapse;
 }
 
 th,td{
-border:1px solid #ccc;
+border:1px solid gray;
 padding:5px;
 text-align:center;
 }
@@ -84,25 +85,42 @@ text-align:center;
 <body>
 
 <header>
-<div class="logo">ФИРМА МПА</div>
-<div class="menu-btn" onclick="toggleMenu()">☰</div>
+<div><b>MPA Business System</b></div>
+<div>
+<button onclick="toggleTheme()">🌙</button>
+<button onclick="toggleMenu()">☰</button>
+</div>
 </header>
 
 <nav id="menu">
-<button onclick="show('machines')">🚛 Машиналар</button>
-<button onclick="show('add')">⛽ Алды/Сатты</button>
-<button onclick="show('report')">📊 Айлык Отчет</button>
+<button onclick="show('dashboard')">📊 Башкы</button>
+<button onclick="show('machines')">🚛 Машина</button>
+<button onclick="show('operations')">⛽ Операция</button>
+<button onclick="show('report')">📄 Отчет</button>
 </nav>
 
-<section id="machines" class="active">
-<h3>Машина кошуу</h3>
-<input type="text" id="carName" placeholder="Машина аты/номери">
+<section id="login" class="active">
+<h3>🔐 Пароль</h3>
+<input type="password" id="password" placeholder="Пароль">
+<button onclick="login()">Кирүү</button>
+</section>
+
+<section id="dashboard">
+<h3>📊 График</h3>
+<button onclick="updateChart('day')">Күн</button>
+<button onclick="updateChart('month')">Ай</button>
+<canvas id="chart"></canvas>
+</section>
+
+<section id="machines">
+<h3>🚛 Машина кошуу</h3>
+<input type="text" id="carName" placeholder="Машина">
 <button onclick="addMachine()">Кошуу</button>
 <div id="machineList"></div>
 </section>
 
-<section id="add">
-<h3>Операция</h3>
+<section id="operations">
+<h3>⛽ Алды / Сатты</h3>
 <select id="machineSelect"></select>
 <select id="type">
 <option value="buy">Алды</option>
@@ -114,28 +132,44 @@ text-align:center;
 </section>
 
 <section id="report">
-<h3>📅 Айлык Отчет</h3>
-<div id="monthlyReport"></div>
+<h3>📄 Айлык Отчет</h3>
+<div id="reportTable"></div>
 </section>
 
 <script>
 
+let password = localStorage.getItem("password") || "1";
 let machines = JSON.parse(localStorage.getItem("machines")) || [];
 let operations = JSON.parse(localStorage.getItem("operations")) || [];
 
 function save(){
 localStorage.setItem("machines",JSON.stringify(machines));
 localStorage.setItem("operations",JSON.stringify(operations));
+localStorage.setItem("password",password);
+}
+
+function login(){
+let p=document.getElementById("password").value;
+if(p===password){
+document.getElementById("login").classList.remove("active");
+show("dashboard");
+}else{
+alert("Туура эмес пароль!");
+}
 }
 
 function toggleMenu(){
 let m=document.getElementById("menu");
-m.style.display = (m.style.display==="flex")?"none":"flex";
+m.style.display=(m.style.display==="flex")?"none":"flex";
 }
 
 function show(id){
 document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
 document.getElementById(id).classList.add("active");
+}
+
+function toggleTheme(){
+document.body.classList.toggle("dark");
 }
 
 function addMachine(){
@@ -163,35 +197,76 @@ let type=document.getElementById("type").value;
 let liters=Number(document.getElementById("liters").value);
 let price=Number(document.getElementById("price").value);
 
-if(!liters||!price) return;
-
 let date=new Date();
 let month=date.getFullYear()+"-"+(date.getMonth()+1);
 
-operations.push({
-machine,
-type,
-liters,
-price,
-date:date.toLocaleString(),
-month
-});
-
+operations.push({machine,type,liters,price,date:date.toLocaleString(),month});
 save();
-alert("Сакталды!");
-renderReport();
+updateChart("month");
+updateReport();
 }
 
-function renderReport(){
-let report=document.getElementById("monthlyReport");
-let currentMonth=new Date().getFullYear()+"-"+(new Date().getMonth()+1);
+let chart;
+
+function updateChart(mode){
+
+let labels=[];
+let dataBuy=[];
+let dataSell=[];
+
+let filtered=operations;
+
+if(mode==="month"){
+let current=new Date().getFullYear()+"-"+(new Date().getMonth()+1);
+filtered=operations.filter(o=>o.month===current);
+}
+
+filtered.forEach(o=>{
+let sum=o.liters*o.price;
+if(o.type==="buy"){
+dataBuy.push(sum);
+dataSell.push(0);
+}else{
+dataSell.push(sum);
+dataBuy.push(0);
+}
+labels.push(o.date);
+});
+
+let ctx=document.getElementById("chart").getContext("2d");
+
+if(chart) chart.destroy();
+
+chart=new Chart(ctx,{
+type:"bar",
+data:{
+labels:labels,
+datasets:[
+{
+label:"Киреше",
+backgroundColor:"green",
+data:dataSell
+},
+{
+label:"Чыгаша",
+backgroundColor:"red",
+data:dataBuy
+}
+]
+}
+});
+}
+
+function updateReport(){
+let report=document.getElementById("reportTable");
+let current=new Date().getFullYear()+"-"+(new Date().getMonth()+1);
 
 let buy=0,sell=0;
 
-operations.forEach(op=>{
-if(op.month===currentMonth){
-if(op.type==="buy") buy+=op.liters*op.price;
-if(op.type==="sell") sell+=op.liters*op.price;
+operations.forEach(o=>{
+if(o.month===current){
+if(o.type==="buy") buy+=o.liters*o.price;
+if(o.type==="sell") sell+=o.liters*o.price;
 }
 });
 
@@ -199,7 +274,7 @@ report.innerHTML=`
 <table>
 <tr><th>Ай</th><th>Алды</th><th>Сатты</th><th>Баланс</th></tr>
 <tr>
-<td>${currentMonth}</td>
+<td>${current}</td>
 <td>${buy}</td>
 <td>${sell}</td>
 <td>${sell-buy}</td>
@@ -209,7 +284,8 @@ report.innerHTML=`
 }
 
 renderMachines();
-renderReport();
+updateChart("month");
+updateReport();
 
 </script>
 
