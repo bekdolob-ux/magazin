@@ -1,31 +1,31 @@
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const photo = document.getElementById("photo");
+function startFun(){
 
-async function startCamera(){
-try{
-const stream = await navigator.mediaDevices.getUserMedia({
-video: { facingMode: "environment" }
-});
-video.srcObject = stream;
-}catch(err){
-alert("Камера иштеген жок. Уруксат бериңиз.");
-}
+// Fullscreen
+if(document.documentElement.requestFullscreen){
+document.documentElement.requestFullscreen();
 }
 
-function takePhoto(){
-if(!video.srcObject){
-alert("Камера ачылган эмес");
-return;
+// Музыка
+const sound = document.getElementById("sound");
+sound.play();
+
+// Вибрация
+if(navigator.vibrate){
+navigator.vibrate([500,200,500]);
 }
 
-canvas.width = video.videoWidth;
-canvas.height = video.videoHeight;
+// Flash эффект
+document.body.style.background="white";
+setTimeout(()=>{
+document.body.style.background="black";
+},200);
 
-const ctx = canvas.getContext("2d");
-ctx.drawImage(video,0,0);
+// Fake freeze
+const freeze = document.getElementById("freeze");
+freeze.classList.remove("hidden");
 
-photo.src = canvas.toDataURL("image/png");
-}
+setTimeout(()=>{
+freeze.classList.add("hidden");
+},3000);
 
-startCamera();
+           }
