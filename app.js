@@ -2,15 +2,23 @@ const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const photo = document.getElementById("photo");
 
-navigator.mediaDevices.getUserMedia({video:true})
-.then(stream=>{
-video.srcObject = stream;
-})
-.catch(err=>{
-alert("Камера уруксаты керек");
+async function startCamera(){
+try{
+const stream = await navigator.mediaDevices.getUserMedia({
+video: { facingMode: "environment" }
 });
+video.srcObject = stream;
+}catch(err){
+alert("Камера иштеген жок. Уруксат бериңиз.");
+}
+}
 
 function takePhoto(){
+if(!video.srcObject){
+alert("Камера ачылган эмес");
+return;
+}
+
 canvas.width = video.videoWidth;
 canvas.height = video.videoHeight;
 
@@ -19,3 +27,5 @@ ctx.drawImage(video,0,0);
 
 photo.src = canvas.toDataURL("image/png");
 }
+
+startCamera();
