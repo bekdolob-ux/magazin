@@ -1,55 +1,37 @@
 body{
-font-family:Arial;
-margin:0;
-background:#f4f6f9;
+    font-family: Arial;
+    text-align:center;
+    padding:20px;
+    background:#f2f2f2;
 }
 
-.container{
-max-width:1000px;
-margin:auto;
-padding:20px;
-}
-
-.tabs{
-display:flex;
-gap:10px;
-margin-bottom:20px;
-}
-
-.tabs button{
-padding:10px 20px;
-border:none;
-background:#007bff;
-color:white;
-cursor:pointer;
+.menu button{
+    padding:8px 15px;
+    margin:5px;
 }
 
 .section{
-display:none;
+    display:none;
 }
 
 .section.active{
-display:block;
+    display:block;
 }
 
-input,select,button{
-padding:8px;
-margin:5px;
+.card{
+    margin:20px auto;
+    width:260px;
+    height:150px;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
 }
 
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
-}
-
-th,td{
-border-bottom:1px solid #ddd;
-padding:8px;
-text-align:center;
-}
-
-.summary{
-margin-top:20px;
-font-weight:bold;
+button{
+    padding:8px 12px;
+    margin:5px;
 }
