@@ -1,57 +1,71 @@
-let products = JSON.parse(localStorage.getItem("products")) || [];
+let products=JSON.parse(localStorage.getItem("products"))||[];
+let dayTotal=0;
+let dayProfit=0;
 
-const list = document.getElementById("list");
-const totalSpan = document.getElementById("total");
-
-function save() {
-    localStorage.setItem("products", JSON.stringify(products));
+function save(){
+localStorage.setItem("products",JSON.stringify(products));
 }
 
-function render() {
-    list.innerHTML = "";
-    let total = 0;
-
-    products.forEach((product, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            ${product.name} - ${product.price} сом
-            <button class="delete" onclick="removeProduct(${index})">X</button>
-        `;
-        list.appendChild(li);
-        total += product.price;
-    });
-
-    totalSpan.textContent = total;
+function showTab(tab){
+document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+document.getElementById(tab).classList.add("active");
 }
 
-function addProduct() {
-    const nameInput = document.getElementById("name");
-    const priceInput = document.getElementById("price");
+function render(){
+const adminList=document.getElementById("adminList");
+const select=document.getElementById("productSelect");
+adminList.innerHTML="";
+select.innerHTML="";
 
-    const name = nameInput.value.trim();
-    const price = Number(priceInput.value);
+products.forEach((p,index)=>{
+adminList.innerHTML+=`
+<tr>
+<td>${p.name}</td>
+<td>${p.stock}</td>
+<td>${p.price}</td>
+</tr>
+`;
 
-    if (!name || !price) return;
-
-    products.push({ name, price });
-
-    nameInput.value = "";
-    priceInput.value = "";
-
-    save();
-    render();
-}
-
-function removeProduct(index) {
-    products.splice(index, 1);
-    save();
-    render();
-}
-
-document.getElementById("addBtn").addEventListener("click", addProduct);
-
-document.getElementById("price").addEventListener("keypress", function(e){
-    if(e.key === "Enter") addProduct();
+select.innerHTML+=`
+<option value="${index}">${p.name}</option>
+`;
 });
+}
 
+function addProduct(){
+const name=document.getElementById("a_name").value;
+const cost=Number(document.getElementById("a_cost").value);
+const price=Number(document.getElementById("a_price").value);
+const stock=Number(document.getElementById("a_stock").value);
+
+if(!name||!cost||!price||!stock)return;
+
+products.push({name,cost,price,stock});
+save();
+render();
+}
+
+function sellProduct(){
+const index=document.getElementById("productSelect").value;
+const qty=Number(document.getElementById("sellQty").value);
+
+if(!products[index]||qty<=0)return;
+
+if(products[index].stock<qty){
+alert("Калдык жетишсиз!");
+return;
+}
+
+products[index].stock-=qty;
+dayTotal+=products[index].price*qty;
+dayProfit+=(products[index].price-products[index].cost)*qty;
+
+document.getElementById("dayTotal").textContent=dayTotal;
+document.getElementById("dayProfit").textContent=dayProfit;
+
+save();
+render();
+}
+
+showTab("admin");
 render();
