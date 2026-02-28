@@ -3,56 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Store PRO</title>
+<title>Deutsch Trainer PRO</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
+<h1>🇩🇪 Deutsch Trainer PRO</h1>
 
-<h2>🏪 Store PRO</h2>
-
-<div class="tabs">
-<button onclick="showTab('admin')">Admin</button>
-<button onclick="showTab('cashier')">Cashier</button>
+<div class="menu">
+<button onclick="showMode('flash')">📇 Карточка</button>
+<button onclick="showMode('test')">📝 Тест</button>
 </div>
 
-<!-- ADMIN -->
-<div id="admin" class="section">
-<h3>Товар кошуу</h3>
-<input id="a_name" placeholder="Аты">
-<input id="a_cost" type="number" placeholder="Өз баасы">
-<input id="a_price" type="number" placeholder="Сатуу баасы">
-<input id="a_stock" type="number" placeholder="Калдык">
-<button onclick="addProduct()">Кошуу</button>
-
-<table>
-<thead>
-<tr>
-<th>Аты</th>
-<th>Калдык</th>
-<th>Баасы</th>
-</tr>
-</thead>
-<tbody id="adminList"></tbody>
-</table>
+<!-- FLASHCARD -->
+<div id="flash" class="section active">
+<div class="card" onclick="flipCard()">
+    <div id="word">Start</div>
 </div>
 
-<!-- CASHIER -->
-<div id="cashier" class="section">
-<h3>Сатуу</h3>
-<select id="productSelect"></select>
-<input id="sellQty" type="number" placeholder="Саны">
-<button onclick="sellProduct()">Сатуу</button>
+<button onclick="speak()">🔊 Угуп көр</button>
 
-<div class="summary">
-Күнүмдүк сатуу: <span id="dayTotal">0</span> сом <br>
-Күнүмдүк пайда: <span id="dayProfit">0</span> сом
+<div class="buttons">
+    <button onclick="knowWord()">Билем ✅</button>
+    <button onclick="nextWord()">Кийинки ▶</button>
 </div>
 </div>
 
+<!-- TEST MODE -->
+<div id="test" class="section">
+<h2>Тест</h2>
+
+<div class="card">
+    <div id="question"></div>
+</div>
+
+<div id="answers"></div>
+
+<p>Туура жооп: <span id="correct">0</span></p>
 </div>
 
 <script src="app.js"></script>
 </body>
-</html>
+                          </html>
