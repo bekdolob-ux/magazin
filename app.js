@@ -1,71 +1,90 @@
-let products=JSON.parse(localStorage.getItem("products"))||[];
-let dayTotal=0;
-let dayProfit=0;
+let words = [
+    {de:"Hallo", kg:"Салам"},
+    {de:"Danke", kg:"Рахмат"},
+    {de:"Bitte", kg:"Сураныч"},
+    {de:"Ja", kg:"Ооба"},
+    {de:"Nein", kg:"Жок"},
+    {de:"Haus", kg:"Үй"},
+    {de:"Auto", kg:"Унаа"},
+    {de:"Buch", kg:"Китеп"},
+    {de:"Wasser", kg:"Суу"},
+    {de:"Freund", kg:"Дос"}
+];
 
-function save(){
-localStorage.setItem("products",JSON.stringify(products));
+let current = 0;
+let flipped = false;
+let correct = 0;
+
+function showMode(mode){
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(mode).classList.add("active");
+
+    if(mode === "test"){
+        loadTest();
+    }
 }
 
-function showTab(tab){
-document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-document.getElementById(tab).classList.add("active");
+function showWord(){
+    document.getElementById("word").textContent = words[current].de;
+    flipped = false;
 }
 
-function render(){
-const adminList=document.getElementById("adminList");
-const select=document.getElementById("productSelect");
-adminList.innerHTML="";
-select.innerHTML="";
-
-products.forEach((p,index)=>{
-adminList.innerHTML+=`
-<tr>
-<td>${p.name}</td>
-<td>${p.stock}</td>
-<td>${p.price}</td>
-</tr>
-`;
-
-select.innerHTML+=`
-<option value="${index}">${p.name}</option>
-`;
-});
+function flipCard(){
+    if(!flipped){
+        document.getElementById("word").textContent = words[current].kg;
+        flipped = true;
+    }
 }
 
-function addProduct(){
-const name=document.getElementById("a_name").value;
-const cost=Number(document.getElementById("a_cost").value);
-const price=Number(document.getElementById("a_price").value);
-const stock=Number(document.getElementById("a_stock").value);
-
-if(!name||!cost||!price||!stock)return;
-
-products.push({name,cost,price,stock});
-save();
-render();
+function nextWord(){
+    current = Math.floor(Math.random() * words.length);
+    showWord();
 }
 
-function sellProduct(){
-const index=document.getElementById("productSelect").value;
-const qty=Number(document.getElementById("sellQty").value);
-
-if(!products[index]||qty<=0)return;
-
-if(products[index].stock<qty){
-alert("Калдык жетишсиз!");
-return;
+function knowWord(){
+    nextWord();
 }
 
-products[index].stock-=qty;
-dayTotal+=products[index].price*qty;
-dayProfit+=(products[index].price-products[index].cost)*qty;
-
-document.getElementById("dayTotal").textContent=dayTotal;
-document.getElementById("dayProfit").textContent=dayProfit;
-
-save();
-render();
+function speak(){
+    let text = words[current].de;
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "de-DE";
+    speech.rate = 0.9;
+    window.speechSynthesis.speak(speech);
 }
 
-showTab("admin");
-render();
+function loadTest(){
+    let qIndex = Math.floor(Math.random() * words.length);
+    let questionWord = words[qIndex];
+
+    document.getElementById("question").textContent = questionWord.de;
+
+    let answersDiv = document.getElementById("answers");
+    answersDiv.innerHTML="";
+
+    let options = [questionWord.kg];
+
+    while(options.length < 4){
+        let rand = words[Math.floor(Math.random()*words.length)].kg;
+        if(!options.includes(rand)){
+            options.push(rand);
+        }
+    }
+
+    options.sort(()=>Math.random()-0.5);
+
+    options.forEach(opt=>{
+        let btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = function(){
+            if(opt === questionWord.kg){
+                correct++;
+                document.getElementById("correct").textContent = correct;
+            }
+            loadTest();
+        };
+        answersDiv.appendChild(btn);
+    });
+}
+
+showWord();
