@@ -1,18 +1,57 @@
-let total = 0;
+let products = JSON.parse(localStorage.getItem("products")) || [];
+
+const list = document.getElementById("list");
+const totalSpan = document.getElementById("total");
+
+function save() {
+    localStorage.setItem("products", JSON.stringify(products));
+}
+
+function render() {
+    list.innerHTML = "";
+    let total = 0;
+
+    products.forEach((product, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            ${product.name} - ${product.price} сом
+            <button class="delete" onclick="removeProduct(${index})">X</button>
+        `;
+        list.appendChild(li);
+        total += product.price;
+    });
+
+    totalSpan.textContent = total;
+}
 
 function addProduct() {
-    const name = document.getElementById("name").value;
-    const price = Number(document.getElementById("price").value);
+    const nameInput = document.getElementById("name");
+    const priceInput = document.getElementById("price");
 
-    if (name === "" || price === 0) return;
+    const name = nameInput.value.trim();
+    const price = Number(priceInput.value);
 
-    const li = document.createElement("li");
-    li.textContent = name + " - " + price + " сом";
-    document.getElementById("list").appendChild(li);
+    if (!name || !price) return;
 
-    total += price;
-    document.getElementById("total").textContent = total;
+    products.push({ name, price });
 
-    document.getElementById("name").value = "";
-    document.getElementById("price").value = "";
+    nameInput.value = "";
+    priceInput.value = "";
+
+    save();
+    render();
 }
+
+function removeProduct(index) {
+    products.splice(index, 1);
+    save();
+    render();
+}
+
+document.getElementById("addBtn").addEventListener("click", addProduct);
+
+document.getElementById("price").addEventListener("keypress", function(e){
+    if(e.key === "Enter") addProduct();
+});
+
+render();
