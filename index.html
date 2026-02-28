@@ -1,9 +1,29 @@
-<h1>Магазин системасы</h1>
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин системасы</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-<input type="text" id="name" placeholder="Товар аты">
-<input type="number" id="price" placeholder="Баасы">
-<button onclick="addProduct()">Кошуу</button>
+<div class="container">
+    <h1>🛒 Магазин системасы</h1>
 
-<ul id="list"></ul>
+    <div class="form">
+        <input id="name" placeholder="Товар аты">
+        <input id="price" type="number" placeholder="Баасы">
+        <button id="addBtn">Кошуу</button>
+    </div>
 
-<h3>Жалпы сумма: <span id="total">0</span> сом</h3>
+    <ul id="list"></ul>
+
+    <div class="total">
+        Жалпы сумма: <span id="total">0</span> сом
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
