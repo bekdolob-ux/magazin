@@ -1,29 +1,145 @@
 <!DOCTYPE html>
 <html lang="ky">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Магазин системасы</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bekbolot POS</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+url("earth.jpg") no-repeat center center fixed;
+background-size:cover;
+color:white;
+text-align:center;
+}
+
+.container{
+max-width:900px;
+margin:30px auto;
+background:rgba(255,255,255,0.1);
+padding:20px;
+border-radius:15px;
+backdrop-filter:blur(10px);
+}
+
+.form{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+margin-bottom:20px;
+}
+
+input,button{
+padding:10px;
+border-radius:8px;
+border:none;
+}
+
+button{
+background:#00c6ff;
+color:black;
+font-weight:bold;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid rgba(255,255,255,0.2);
+}
+
+.summary{
+margin-top:20px;
+font-size:18px;
+font-weight:bold;
+}
+</style>
 </head>
+
 <body>
 
+<h1>🌍 Bekbolot POS Система</h1>
+
 <div class="container">
-    <h1>🛒 Магазин системасы</h1>
 
-    <div class="form">
-        <input id="name" placeholder="Товар аты">
-        <input id="price" type="number" placeholder="Баасы">
-        <button id="addBtn">Кошуу</button>
-    </div>
-
-    <ul id="list"></ul>
-
-    <div class="total">
-        Жалпы сумма: <span id="total">0</span> сом
-    </div>
+<div class="form">
+<input id="name" placeholder="Товар аты">
+<input id="price" type="number" placeholder="Баасы">
+<input id="qty" type="number" placeholder="Саны">
+<button onclick="addProduct()">Кошуу</button>
 </div>
 
-<script src="app.js"></script>
+<table>
+<thead>
+<tr>
+<th>Аты</th>
+<th>Саны</th>
+<th>Баасы</th>
+<th>Жалпы</th>
+</tr>
+</thead>
+<tbody id="list"></tbody>
+</table>
+
+<div class="summary">
+Жалпы сумма: <span id="total">0</span> сом
+</div>
+
+</div>
+
+<script>
+let products=JSON.parse(localStorage.getItem("products"))||[];
+
+function save(){
+localStorage.setItem("products",JSON.stringify(products));
+}
+
+function render(){
+const list=document.getElementById("list");
+const totalSpan=document.getElementById("total");
+list.innerHTML="";
+let total=0;
+
+products.forEach(p=>{
+const row=document.createElement("tr");
+const sum=p.price*p.qty;
+total+=sum;
+
+row.innerHTML=`
+<td>${p.name}</td>
+<td>${p.qty}</td>
+<td>${p.price}</td>
+<td>${sum}</td>
+`;
+
+list.appendChild(row);
+});
+
+totalSpan.textContent=total;
+}
+
+function addProduct(){
+const name=document.getElementById("name").value;
+const price=Number(document.getElementById("price").value);
+const qty=Number(document.getElementById("qty").value);
+if(!name||!price||!qty)return;
+products.push({name,price,qty});
+save();
+render();
+document.getElementById("name").value="";
+document.getElementById("price").value="";
+document.getElementById("qty").value="";
+}
+
+render();
+</script>
+
 </body>
 </html>
