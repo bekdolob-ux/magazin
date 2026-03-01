@@ -2,88 +2,99 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Hacker Cinematic</title>
+<title>ULTRA RED CHAOS</title>
 <style>
 html,body{
 margin:0;
 padding:0;
 height:100%;
 overflow:hidden;
-background:black;
-color:#00ff00;
 font-family:monospace;
 display:flex;
 align-items:center;
 justify-content:center;
 flex-direction:column;
 text-align:center;
+background:black;
+color:white;
 }
 
-/* Фон */
-body{
-background:radial-gradient(circle at center,#001100,black 70%);
+/* Кызыл жаркылдоо */
+@keyframes redFlash{
+0%{background:black;}
+50%{background:red;}
+100%{background:black;}
+}
+
+.redMode{
+animation:redFlash 0.4s infinite;
 }
 
 /* Титирөө */
 .shake{
-animation:shake 0.1s infinite;
+animation:shake 0.07s infinite;
 }
+
 @keyframes shake{
 0%{transform:translate(0,0);}
-25%{transform:translate(3px,-3px);}
-50%{transform:translate(-3px,3px);}
-75%{transform:translate(3px,3px);}
-100%{transform:translate(-3px,-3px);}
+25%{transform:translate(6px,-6px);}
+50%{transform:translate(-6px,6px);}
+75%{transform:translate(6px,6px);}
+100%{transform:translate(-6px,-6px);}
 }
 
-#terminal{
-white-space:pre-line;
-font-size:15px;
-}
-
+/* Чоң WARNING текст */
 #alert{
-font-size:28px;
-color:red;
-display:none;
-margin-top:20px;
+font-size:38px;
+animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.2);}
+100%{transform:scale(1);}
+}
+
+/* Ак flash */
+#flash{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:white;
+opacity:0;
+pointer-events:none;
 }
 </style>
 </head>
 <body>
 
-<div id="terminal">Booting system...</div>
-<div id="alert">⚠ ACCESS GRANTED ⚠</div>
+<div id="alert">🚨 WARNING 🚨</div>
+<div>Critical system meltdown</div>
+<div id="flash"></div>
 
 <script>
-const terminal=document.getElementById("terminal");
-const alertBox=document.getElementById("alert");
 
-let percent=0;
-
+document.body.classList.add("redMode");
 document.body.classList.add("shake");
+
+const flash=document.getElementById("flash");
+
+// Ак жаркылдоо ар 3 секундда
+setInterval(()=>{
+ flash.style.opacity="1";
+ setTimeout(()=>flash.style.opacity="0",100);
+},3000);
 
 // Вибрация (Android)
 if(navigator.vibrate){
- setInterval(()=>navigator.vibrate([200,100,200]),3000);
+ setInterval(()=>{
+   navigator.vibrate([400,150,400]);
+ },2000);
 }
 
-function scan(){
- if(percent<=100){
-   terminal.innerHTML+="\nBypassing firewall... "+percent+"%";
-   percent+=5;
-   setTimeout(scan,150);
- }else{
-   terminal.innerHTML+="\nInjecting payload...";
-   setTimeout(()=>{
-     alertBox.style.display="block";
-     document.body.style.background="red";
-   },1000);
- }
-}
-
-setTimeout(scan,1000);
-
-// Сирена (биринчи тапта гана иштейт)
+// Сирена (биринчи тапта)
 let audio;
 document.body.addEventListener("click",function(){
  if(!audio){
@@ -92,7 +103,7 @@ document.body.addEventListener("click",function(){
    audio.play();
  }
 });
-</script>
 
+</script>
 </body>
 </html>
