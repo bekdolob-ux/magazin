@@ -2,110 +2,96 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Hacker Music Mode</title>
+<title>Hacker Cinematic</title>
 <style>
 html,body{
 margin:0;
 padding:0;
+height:100%;
+overflow:hidden;
 background:black;
 color:#00ff00;
 font-family:monospace;
-height:100%;
-overflow:hidden;
 display:flex;
 align-items:center;
 justify-content:center;
 flex-direction:column;
+text-align:center;
 }
 
-h1{
-font-size:22px;
+/* Фон */
+body{
+background:radial-gradient(circle at center,#001100,black 70%);
 }
 
-canvas{
-position:fixed;
-top:0;
-left:0;
-z-index:-1;
+/* Титирөө */
+.shake{
+animation:shake 0.1s infinite;
+}
+@keyframes shake{
+0%{transform:translate(0,0);}
+25%{transform:translate(3px,-3px);}
+50%{transform:translate(-3px,3px);}
+75%{transform:translate(3px,3px);}
+100%{transform:translate(-3px,-3px);}
+}
+
+#terminal{
+white-space:pre-line;
+font-size:15px;
+}
+
+#alert{
+font-size:28px;
+color:red;
+display:none;
+margin-top:20px;
 }
 </style>
 </head>
 <body>
 
-<h1>🔥 TAP TO START HACKER MODE 🔥</h1>
-
-<canvas id="matrix"></canvas>
+<div id="terminal">Booting system...</div>
+<div id="alert">⚠ ACCESS GRANTED ⚠</div>
 
 <script>
-// ===== MATRIX =====
-const canvas=document.getElementById("matrix");
-const ctx=canvas.getContext("2d");
+const terminal=document.getElementById("terminal");
+const alertBox=document.getElementById("alert");
 
-function resize(){
- canvas.width=window.innerWidth;
- canvas.height=window.innerHeight;
+let percent=0;
+
+document.body.classList.add("shake");
+
+// Вибрация (Android)
+if(navigator.vibrate){
+ setInterval(()=>navigator.vibrate([200,100,200]),3000);
 }
-resize();
-window.onresize=resize;
 
-const letters="01";
-const fontSize=14;
-let columns=Math.floor(canvas.width/fontSize);
-let drops=[];
-for(let i=0;i<columns;i++) drops[i]=1;
-
-function draw(){
- ctx.fillStyle="rgba(0,0,0,0.05)";
- ctx.fillRect(0,0,canvas.width,canvas.height);
- ctx.fillStyle="#0f0";
- ctx.font=fontSize+"px monospace";
- for(let i=0;i<drops.length;i++){
-   const text=letters[Math.floor(Math.random()*2)];
-   ctx.fillText(text,i*fontSize,drops[i]*fontSize);
-   if(drops[i]*fontSize>canvas.height) drops[i]=0;
-   drops[i]++;
+function scan(){
+ if(percent<=100){
+   terminal.innerHTML+="\nBypassing firewall... "+percent+"%";
+   percent+=5;
+   setTimeout(scan,150);
+ }else{
+   terminal.innerHTML+="\nInjecting payload...";
+   setTimeout(()=>{
+     alertBox.style.display="block";
+     document.body.style.background="red";
+   },1000);
  }
 }
-setInterval(draw,30);
 
-// ===== MUSIC =====
+setTimeout(scan,1000);
+
+// Сирена (биринчи тапта гана иштейт)
 let audio;
-function startHackerMode(){
- document.body.innerHTML="<canvas id='matrix'></canvas>";
- document.body.style.background="black";
-
- // музыка
- audio=new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
- audio.loop=true;
- audio.volume=1.0;
- audio.play();
-
- // кайра matrix баштайбыз
- const c=document.getElementById("matrix");
- const cx=c.getContext("2d");
- c.width=window.innerWidth;
- c.height=window.innerHeight;
-
- let cols=Math.floor(c.width/fontSize);
- let dr=[];
- for(let i=0;i<cols;i++) dr[i]=1;
-
- setInterval(function(){
-  cx.fillStyle="rgba(0,0,0,0.05)";
-  cx.fillRect(0,0,c.width,c.height);
-  cx.fillStyle="#0f0";
-  cx.font=fontSize+"px monospace";
-  for(let i=0;i<dr.length;i++){
-    const t=letters[Math.floor(Math.random()*2)];
-    cx.fillText(t,i*fontSize,dr[i]*fontSize);
-    if(dr[i]*fontSize>c.height) dr[i]=0;
-    dr[i]++;
-  }
- },30);
-}
-
-// биринчи басканда башталат
-document.body.addEventListener("click",startHackerMode,{once:true});
+document.body.addEventListener("click",function(){
+ if(!audio){
+   audio=new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+   audio.loop=true;
+   audio.play();
+ }
+});
 </script>
 
 </body>
