@@ -82,25 +82,59 @@ ${p.qty === 0 ? '🔴 Жок' : p.qty <= 2 ? '🟡 Аз калды' : '🟢 Ба
 function sell(index) {
   if (products[index].qty <= 0) return;
 
+  // складдан 1 азайтат
   products[index].qty -= 1;
-  total = Number(total) + products[index].price;
-todaySales += products[index].price;
-todayCount += 1;
 
-localStorage.setItem("todaySales", todaySales);
-localStorage.setItem("todayCount", todayCount);
+  // корзинага кошот
+  cart.push({
+    name: products[index].name,
+    price: products[index].price
+  });
+
   localStorage.setItem("products", JSON.stringify(products));
-  localStorage.setItem("total", total);
-document.getElementById("todaySales").textContent = todaySales;
-document.getElementById("todayCount").textContent = todayCount;
-  document.getElementById("total").textContent = total;
-  renderProducts();
-}
 
-function removeProduct(index) {
-  if (confirm("Чын эле өчүрөсүзбү?")) {
-    products.splice(index, 1);
-    localStorage.setItem("products", JSON.stringify(products));
-    renderProducts();
+  renderProducts();
+  renderCart();
+}
+function renderCart() {
+  const cartDiv = document.getElementById("cart");
+  const totalSpan = document.getElementById("cartTotal");
+
+  cartDiv.innerHTML = "";
+  let sum = 0;
+
+  cart.forEach((item) => {
+    sum += item.price;
+
+    cartDiv.innerHTML += `
+      <div style="background:#f1f1f1;padding:8px;margin-bottom:5px;border-radius:6px;">
+        ${item.name} - ${item.price} сом
+      </div>
+    `;
+  });
+
+  totalSpan.textContent = sum;
+}
+function checkout() {
+  if (cart.length === 0) {
+    alert("Корзина бош");
+    return;
   }
+
+  let sum = cart.reduce((a, b) => a + b.price, 0);
+
+  total = Number(total) + sum;
+  todaySales += sum;
+  todayCount += cart.length;
+
+  localStorage.setItem("total", total);
+  localStorage.setItem("todaySales", todaySales);
+  localStorage.setItem("todayCount", todayCount);
+
+  document.getElementById("total").textContent = total;
+  document.getElementById("todaySales").textContent = todaySales;
+  document.getElementById("todayCount").textContent = todayCount;
+
+  cart = [];
+  renderCart();
 }
