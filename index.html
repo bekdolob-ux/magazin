@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>BekOS v5</title>
+<title>BekOS v6</title>
 <style>
 html,body{
 margin:0;
@@ -54,6 +54,7 @@ margin-top:10px;
 // ===== MATRIX =====
 const canvas=document.getElementById("matrix");
 const ctx=canvas.getContext("2d");
+
 function resize(){
  canvas.width=window.innerWidth;
  canvas.height=window.innerHeight;
@@ -84,7 +85,7 @@ setInterval(draw,30);
 // ===== SYSTEM =====
 const screen=document.getElementById("screen");
 let videoStream=null;
-let audioStream=null;
+let audio=null;
 
 function passwordScreen(){
  screen.innerHTML="Enter Root Password:<br><input type='password' id='pass'><br>";
@@ -102,21 +103,21 @@ function passwordScreen(){
 
 function loadSystem(){
  screen.innerHTML=
- "BekOS v5.0<br><br>"+
+ "BekOS v6.0<br><br>"+
  "<button onclick='startCamera()'>Start Camera</button>"+
  "<button onclick='stopCamera()'>Stop Camera</button>"+
  "<button onclick='snapshot()'>Snapshot</button><br>"+
- "<button onclick='startMic()'>Mic On</button>"+
- "<button onclick='systemInfo()'>System Info</button>"+
- "<button onclick='wifiScan()'>WiFi Scan</button>"+
+ "<button onclick='playMusic()'>Play Music</button>"+
+ "<button onclick='stopMusic()'>Stop Music</button><br>"+
  "<button onclick='terminal()'>Terminal</button>"+
+ "<button onclick='wifiScan()'>WiFi Scan</button>"+
  "<button onclick='shutdown()'>Shutdown</button>"+
  "<button onclick='restart()'>Restart</button><br><br>"+
  "<div id='output'></div>";
 }
 
+// ===== CAMERA =====
 function startCamera(){
- const output=document.getElementById("output");
  navigator.mediaDevices.getUserMedia({video:true})
  .then(stream=>{
    videoStream=stream;
@@ -124,10 +125,10 @@ function startCamera(){
    video.id="cam";
    video.srcObject=stream;
    video.autoplay=true;
-   output.innerHTML="";
-   output.appendChild(video);
+   document.getElementById("output").innerHTML="";
+   document.getElementById("output").appendChild(video);
  })
- .catch(()=>output.innerHTML="Camera Blocked ❌");
+ .catch(()=>alert("Camera Blocked ❌"));
 }
 
 function stopCamera(){
@@ -150,30 +151,21 @@ function snapshot(){
  link.click();
 }
 
-function startMic(){
- navigator.mediaDevices.getUserMedia({audio:true})
- .then(stream=>{
-   audioStream=stream;
-   document.getElementById("output").innerHTML="Microphone Active 🎤";
- })
- .catch(()=>document.getElementById("output").innerHTML="Mic Blocked ❌");
+// ===== MUSIC =====
+function playMusic(){
+ if(!audio){
+   audio=new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+   audio.loop=true;
+ }
+ audio.volume=1.0;
+ audio.play();
 }
 
-function systemInfo(){
- document.getElementById("output").innerHTML=
- "Platform: "+navigator.platform+"<br>"+
- "User Agent: "+navigator.userAgent;
+function stopMusic(){
+ if(audio) audio.pause();
 }
 
-function wifiScan(){
- const output=document.getElementById("output");
- output.innerHTML="Scanning WiFi...<br>";
- let networks=["TP-Link_5G","AndroidAP","Home_WiFi","BekbolotNet"];
- networks.forEach((n,i)=>{
-   setTimeout(()=>output.innerHTML+="Found: "+n+"<br>",i*500);
- });
-}
-
+// ===== TERMINAL =====
 function terminal(){
  const output=document.getElementById("output");
  output.innerHTML="Terminal Ready<br><input id='cmd'>";
@@ -188,7 +180,7 @@ function terminal(){
 function runCommand(cmd){
  const output=document.getElementById("output");
  if(cmd==="help"){
-   output.innerHTML+="<br>Commands: help, clear, date, ip, exit";
+   output.innerHTML+="<br>Commands: help, clear, date, exit";
  }
  else if(cmd==="clear"){
    output.innerHTML="";
@@ -196,15 +188,22 @@ function runCommand(cmd){
  else if(cmd==="date"){
    output.innerHTML+="<br>"+new Date();
  }
- else if(cmd==="ip"){
-   output.innerHTML+="<br>"+location.hostname;
- }
  else if(cmd==="exit"){
    loadSystem();
  }
  else{
    output.innerHTML+="<br>Unknown Command";
  }
+}
+
+// ===== WIFI FAKE =====
+function wifiScan(){
+ const output=document.getElementById("output");
+ output.innerHTML="Scanning WiFi...<br>";
+ let networks=["TP-Link_5G","AndroidAP","Home_WiFi","BekbolotNet"];
+ networks.forEach((n,i)=>{
+   setTimeout(()=>output.innerHTML+="Found: "+n+"<br>",i*500);
+ });
 }
 
 function shutdown(){
