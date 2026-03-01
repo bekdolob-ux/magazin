@@ -1,4 +1,15 @@
 let products = JSON.parse(localStorage.getItem("products")) || [];
+let today = new Date().toLocaleDateString();
+let savedDate = localStorage.getItem("todayDate");
+
+if (savedDate !== today) {
+  localStorage.setItem("todayDate", today);
+  localStorage.setItem("todaySales", 0);
+  localStorage.setItem("todayCount", 0);
+}
+
+let todaySales = Number(localStorage.getItem("todaySales")) || 0;
+let todayCount = Number(localStorage.getItem("todayCount")) || 0;
 let total = localStorage.getItem("total") || 0;
 
 document.getElementById("total").textContent = total;
@@ -61,7 +72,11 @@ function sell(index) {
 
   products[index].qty -= 1;
   total = Number(total) + products[index].price;
+todaySales += products[index].price;
+todayCount += 1;
 
+localStorage.setItem("todaySales", todaySales);
+localStorage.setItem("todayCount", todayCount);
   localStorage.setItem("products", JSON.stringify(products));
   localStorage.setItem("total", total);
 
