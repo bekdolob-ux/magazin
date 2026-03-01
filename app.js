@@ -1,4 +1,5 @@
 let products = JSON.parse(localStorage.getItem("products")) || [];
+let cart = [];
 let today = new Date().toLocaleDateString();
 let savedDate = localStorage.getItem("todayDate");
 
