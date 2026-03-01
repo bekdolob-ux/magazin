@@ -24,10 +24,14 @@
 
 <input type="number" id="price" placeholder="Баасы">
 
-<input type="number" id="qty" placeholder="Саны (даана)">
-
+<input type="number" id="qty" placeholder="Саны (даана)"
 <button onclick="addProduct()">Кошуу</button>
-<h2>🛒 Сатуу</h2>
+<div style="background:#1976d2;color:white;padding:12px;border-radius:12px;margin-bottom:15px;">
+  📊 Бүгүн сатылды: <span id="todaySales"></span> сом
+  <br>
+  🛒 Даана: <span id="todayCount"></span>
+</div>
+  <h2>🛒 Сатуу</h2>
 <div id="products"></div>
 
 </div>
