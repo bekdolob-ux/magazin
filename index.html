@@ -2,108 +2,85 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ULTRA RED CHAOS</title>
+<title>Full Red Screen</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
 html,body{
-margin:0;
-padding:0;
-height:100%;
-overflow:hidden;
-font-family:monospace;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-text-align:center;
-background:black;
-color:white;
-}
-
-/* Кызыл жаркылдоо */
-@keyframes redFlash{
-0%{background:black;}
-50%{background:red;}
-100%{background:black;}
-}
-
-.redMode{
-animation:redFlash 0.4s infinite;
+  width:100%;
+  height:100%;
+  background:red;
+  overflow:hidden;
+  font-family:monospace;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
 }
 
 /* Титирөө */
 .shake{
-animation:shake 0.07s infinite;
+  animation:shake 0.08s infinite;
 }
 
 @keyframes shake{
-0%{transform:translate(0,0);}
-25%{transform:translate(6px,-6px);}
-50%{transform:translate(-6px,6px);}
-75%{transform:translate(6px,6px);}
-100%{transform:translate(-6px,-6px);}
+  0%{transform:translate(0,0);}
+  25%{transform:translate(6px,-6px);}
+  50%{transform:translate(-6px,6px);}
+  75%{transform:translate(6px,6px);}
+  100%{transform:translate(-6px,-6px);}
 }
 
-/* Чоң WARNING текст */
-#alert{
-font-size:38px;
-animation:pulse 1s infinite;
+/* Жаркылдоо */
+@keyframes flash{
+  0%{opacity:1;}
+  50%{opacity:0.5;}
+  100%{opacity:1;}
 }
 
-@keyframes pulse{
-0%{transform:scale(1);}
-50%{transform:scale(1.2);}
-100%{transform:scale(1);}
+.flash{
+  animation:flash 0.4s infinite;
 }
 
-/* Ак flash */
-#flash{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:white;
-opacity:0;
-pointer-events:none;
+h1{
+  font-size:32px;
 }
 </style>
 </head>
-<body>
+<body class="shake flash">
 
-<div id="alert">🚨 WARNING 🚨</div>
-<div>Critical system meltdown</div>
-<div id="flash"></div>
+<h1>🚨 SYSTEM FAILURE 🚨</h1>
+<p>Critical meltdown detected...</p>
 
 <script>
 
-document.body.classList.add("redMode");
-document.body.classList.add("shake");
-
-const flash=document.getElementById("flash");
-
-// Ак жаркылдоо ар 3 секундда
-setInterval(()=>{
- flash.style.opacity="1";
- setTimeout(()=>flash.style.opacity="0",100);
-},3000);
-
-// Вибрация (Android)
+// Android вибрация
 if(navigator.vibrate){
- setInterval(()=>{
-   navigator.vibrate([400,150,400]);
- },2000);
+  setInterval(()=>{
+    navigator.vibrate([400,150,400]);
+  },2000);
 }
 
-// Сирена (биринчи тапта)
+// Сирена (биринчи тийгенде)
 let audio;
 document.body.addEventListener("click",function(){
- if(!audio){
-   audio=new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
-   audio.loop=true;
-   audio.play();
- }
+  if(!audio){
+    audio=new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+    audio.loop=true;
+    audio.play();
+  }
 });
 
 </script>
+
 </body>
 </html>
