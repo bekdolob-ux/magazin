@@ -17,12 +17,17 @@ function login() {
 function addProduct() {
   const name = document.getElementById("name").value;
   const price = document.getElementById("price").value;
+  const qty = document.getElementById("qty").value;
 
-  if (!name || !price) return;
+  if (!name || !price || !qty) return;
 
-  products.push({ name, price: Number(price) });
+  products.push({
+    name: name,
+    price: Number(price),
+    qty: Number(qty)
+  });
+
   localStorage.setItem("products", JSON.stringify(products));
-
   renderProducts();
 }
 
@@ -32,16 +37,26 @@ function renderProducts() {
 
   products.forEach((p, index) => {
     container.innerHTML += `
-      <div>
-        ${p.name} - ${p.price} сом
-        <button onclick="sell(${index})">Сатуу</button>
+      <div style="margin-bottom:10px;">
+        ${p.name} - ${p.price} сом 
+        <br>📦 Калдык: ${p.qty}
+        <button onclick="sell(${index})" ${p.qty <= 0 ? "disabled" : ""}>
+          ${p.qty <= 0 ? "Түгөндү" : "Сатуу"}
+        </button>
       </div>
     `;
   });
 }
 
 function sell(index) {
+  if (products[index].qty <= 0) return;
+
+  products[index].qty -= 1;
   total = Number(total) + products[index].price;
+
+  localStorage.setItem("products", JSON.stringify(products));
   localStorage.setItem("total", total);
+
   document.getElementById("total").textContent = total;
+  renderProducts();
 }
