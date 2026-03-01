@@ -13,7 +13,8 @@ let todayCount = Number(localStorage.getItem("todayCount")) || 0;
 let total = localStorage.getItem("total") || 0;
 
 document.getElementById("total").textContent = total;
-
+document.getElementById("todaySales").textContent = todaySales;
+document.getElementById("todayCount").textContent = todayCount;
 function login() {
   const pin = document.getElementById("pinInput").value;
   if (pin === "1234") {
@@ -79,7 +80,8 @@ localStorage.setItem("todaySales", todaySales);
 localStorage.setItem("todayCount", todayCount);
   localStorage.setItem("products", JSON.stringify(products));
   localStorage.setItem("total", total);
-
+document.getElementById("todaySales").textContent = todaySales;
+document.getElementById("todayCount").textContent = todayCount;
   document.getElementById("total").textContent = total;
   renderProducts();
 }
