@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>BekOS v6</title>
+<title>Hacker Music Mode</title>
 <style>
 html,body{
 margin:0;
@@ -12,43 +12,29 @@ color:#00ff00;
 font-family:monospace;
 height:100%;
 overflow:hidden;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
 }
-#screen{
-position:absolute;
-top:20px;
-left:20px;
-z-index:2;
-max-width:95%;
+
+h1{
+font-size:22px;
 }
-input{
-background:black;
-color:#00ff00;
-border:1px solid #00ff00;
-padding:5px;
-}
-button{
-background:black;
-color:#00ff00;
-border:1px solid #00ff00;
-padding:5px 10px;
-margin:5px;
-}
+
 canvas{
 position:fixed;
 top:0;
 left:0;
-}
-video{
-width:280px;
-border:1px solid #00ff00;
-margin-top:10px;
+z-index:-1;
 }
 </style>
 </head>
 <body>
 
+<h1>🔥 TAP TO START HACKER MODE 🔥</h1>
+
 <canvas id="matrix"></canvas>
-<div id="screen"></div>
 
 <script>
 // ===== MATRIX =====
@@ -82,139 +68,45 @@ function draw(){
 }
 setInterval(draw,30);
 
-// ===== SYSTEM =====
-const screen=document.getElementById("screen");
-let videoStream=null;
-let audio=null;
-
-function passwordScreen(){
- screen.innerHTML="Enter Root Password:<br><input type='password' id='pass'><br>";
- document.getElementById("pass").focus();
- document.getElementById("pass").addEventListener("keydown",function(e){
-  if(e.key==="Enter"){
-    if(this.value==="bek002"){
-      loadSystem();
-    }else{
-      screen.innerHTML+="<br>ACCESS DENIED ❌";
-    }
-  }
- });
-}
-
-function loadSystem(){
- screen.innerHTML=
- "BekOS v6.0<br><br>"+
- "<button onclick='startCamera()'>Start Camera</button>"+
- "<button onclick='stopCamera()'>Stop Camera</button>"+
- "<button onclick='snapshot()'>Snapshot</button><br>"+
- "<button onclick='playMusic()'>Play Music</button>"+
- "<button onclick='stopMusic()'>Stop Music</button><br>"+
- "<button onclick='terminal()'>Terminal</button>"+
- "<button onclick='wifiScan()'>WiFi Scan</button>"+
- "<button onclick='shutdown()'>Shutdown</button>"+
- "<button onclick='restart()'>Restart</button><br><br>"+
- "<div id='output'></div>";
-}
-
-// ===== CAMERA =====
-function startCamera(){
- navigator.mediaDevices.getUserMedia({video:true})
- .then(stream=>{
-   videoStream=stream;
-   const video=document.createElement("video");
-   video.id="cam";
-   video.srcObject=stream;
-   video.autoplay=true;
-   document.getElementById("output").innerHTML="";
-   document.getElementById("output").appendChild(video);
- })
- .catch(()=>alert("Camera Blocked ❌"));
-}
-
-function stopCamera(){
- if(videoStream){
-   videoStream.getTracks().forEach(track=>track.stop());
-   document.getElementById("output").innerHTML="Camera Stopped";
- }
-}
-
-function snapshot(){
- const video=document.getElementById("cam");
- if(!video) return;
- const snapCanvas=document.createElement("canvas");
- snapCanvas.width=video.videoWidth;
- snapCanvas.height=video.videoHeight;
- snapCanvas.getContext("2d").drawImage(video,0,0);
- const link=document.createElement("a");
- link.download="snapshot.png";
- link.href=snapCanvas.toDataURL();
- link.click();
-}
-
 // ===== MUSIC =====
-function playMusic(){
- if(!audio){
-   audio=new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
-   audio.loop=true;
- }
+let audio;
+function startHackerMode(){
+ document.body.innerHTML="<canvas id='matrix'></canvas>";
+ document.body.style.background="black";
+
+ // музыка
+ audio=new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+ audio.loop=true;
  audio.volume=1.0;
  audio.play();
-}
 
-function stopMusic(){
- if(audio) audio.pause();
-}
+ // кайра matrix баштайбыз
+ const c=document.getElementById("matrix");
+ const cx=c.getContext("2d");
+ c.width=window.innerWidth;
+ c.height=window.innerHeight;
 
-// ===== TERMINAL =====
-function terminal(){
- const output=document.getElementById("output");
- output.innerHTML="Terminal Ready<br><input id='cmd'>";
- document.getElementById("cmd").focus();
- document.getElementById("cmd").addEventListener("keydown",function(e){
-  if(e.key==="Enter"){
-   runCommand(this.value);
+ let cols=Math.floor(c.width/fontSize);
+ let dr=[];
+ for(let i=0;i<cols;i++) dr[i]=1;
+
+ setInterval(function(){
+  cx.fillStyle="rgba(0,0,0,0.05)";
+  cx.fillRect(0,0,c.width,c.height);
+  cx.fillStyle="#0f0";
+  cx.font=fontSize+"px monospace";
+  for(let i=0;i<dr.length;i++){
+    const t=letters[Math.floor(Math.random()*2)];
+    cx.fillText(t,i*fontSize,dr[i]*fontSize);
+    if(dr[i]*fontSize>c.height) dr[i]=0;
+    dr[i]++;
   }
- });
+ },30);
 }
 
-function runCommand(cmd){
- const output=document.getElementById("output");
- if(cmd==="help"){
-   output.innerHTML+="<br>Commands: help, clear, date, exit";
- }
- else if(cmd==="clear"){
-   output.innerHTML="";
- }
- else if(cmd==="date"){
-   output.innerHTML+="<br>"+new Date();
- }
- else if(cmd==="exit"){
-   loadSystem();
- }
- else{
-   output.innerHTML+="<br>Unknown Command";
- }
-}
-
-// ===== WIFI FAKE =====
-function wifiScan(){
- const output=document.getElementById("output");
- output.innerHTML="Scanning WiFi...<br>";
- let networks=["TP-Link_5G","AndroidAP","Home_WiFi","BekbolotNet"];
- networks.forEach((n,i)=>{
-   setTimeout(()=>output.innerHTML+="Found: "+n+"<br>",i*500);
- });
-}
-
-function shutdown(){
- document.body.innerHTML="<h1 style='color:#0f0;text-align:center;margin-top:40vh;'>SYSTEM OFF</h1>";
-}
-
-function restart(){
- location.reload();
-}
-
-passwordScreen();
+// биринчи басканда башталат
+document.body.addEventListener("click",startHackerMode,{once:true});
 </script>
+
 </body>
 </html>
