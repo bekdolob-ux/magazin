@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>BekOS v4</title>
+<title>BekOS v5</title>
 <style>
 html,body{
 margin:0;
@@ -13,22 +13,19 @@ font-family:monospace;
 height:100%;
 overflow:hidden;
 }
-
 #screen{
 position:absolute;
 top:20px;
 left:20px;
 z-index:2;
-max-width:90%;
+max-width:95%;
 }
-
 input{
 background:black;
 color:#00ff00;
 border:1px solid #00ff00;
 padding:5px;
 }
-
 button{
 background:black;
 color:#00ff00;
@@ -36,11 +33,15 @@ border:1px solid #00ff00;
 padding:5px 10px;
 margin:5px;
 }
-
 canvas{
 position:fixed;
 top:0;
 left:0;
+}
+video{
+width:280px;
+border:1px solid #00ff00;
+margin-top:10px;
 }
 </style>
 </head>
@@ -50,10 +51,9 @@ left:0;
 <div id="screen"></div>
 
 <script>
-// MATRIX
+// ===== MATRIX =====
 const canvas=document.getElementById("matrix");
 const ctx=canvas.getContext("2d");
-
 function resize(){
  canvas.width=window.innerWidth;
  canvas.height=window.innerHeight;
@@ -65,7 +65,6 @@ const letters="01";
 const fontSize=14;
 let columns=Math.floor(canvas.width/fontSize);
 let drops=[];
-
 for(let i=0;i<columns;i++) drops[i]=1;
 
 function draw(){
@@ -73,7 +72,6 @@ function draw(){
  ctx.fillRect(0,0,canvas.width,canvas.height);
  ctx.fillStyle="#0f0";
  ctx.font=fontSize+"px monospace";
-
  for(let i=0;i<drops.length;i++){
    const text=letters[Math.floor(Math.random()*2)];
    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
@@ -83,8 +81,10 @@ function draw(){
 }
 setInterval(draw,30);
 
-// SYSTEM
+// ===== SYSTEM =====
 const screen=document.getElementById("screen");
+let videoStream=null;
+let audioStream=null;
 
 function passwordScreen(){
  screen.innerHTML="Enter Root Password:<br><input type='password' id='pass'><br>";
@@ -102,52 +102,67 @@ function passwordScreen(){
 
 function loadSystem(){
  screen.innerHTML=
- "BekOS v4.0<br><br>"+
- "<button onclick='cameraHack()'>Camera</button>"+
- "<button onclick='micHack()'>Microphone</button>"+
+ "BekOS v5.0<br><br>"+
+ "<button onclick='startCamera()'>Start Camera</button>"+
+ "<button onclick='stopCamera()'>Stop Camera</button>"+
+ "<button onclick='snapshot()'>Snapshot</button><br>"+
+ "<button onclick='startMic()'>Mic On</button>"+
  "<button onclick='systemInfo()'>System Info</button>"+
  "<button onclick='wifiScan()'>WiFi Scan</button>"+
- "<button onclick='fbi()'>FBI Mode</button>"+
+ "<button onclick='terminal()'>Terminal</button>"+
  "<button onclick='shutdown()'>Shutdown</button>"+
  "<button onclick='restart()'>Restart</button><br><br>"+
  "<div id='output'></div>";
 }
 
-function cameraHack(){
+function startCamera(){
  const output=document.getElementById("output");
- output.innerHTML="Accessing Camera...<br>";
  navigator.mediaDevices.getUserMedia({video:true})
  .then(stream=>{
+   videoStream=stream;
    const video=document.createElement("video");
+   video.id="cam";
    video.srcObject=stream;
    video.autoplay=true;
-   video.style.width="300px";
-   output.innerHTML="Camera Active 📷<br>";
+   output.innerHTML="";
    output.appendChild(video);
  })
  .catch(()=>output.innerHTML="Camera Blocked ❌");
 }
 
-function micHack(){
- const output=document.getElementById("output");
- output.innerHTML="Accessing Microphone...<br>";
+function stopCamera(){
+ if(videoStream){
+   videoStream.getTracks().forEach(track=>track.stop());
+   document.getElementById("output").innerHTML="Camera Stopped";
+ }
+}
+
+function snapshot(){
+ const video=document.getElementById("cam");
+ if(!video) return;
+ const snapCanvas=document.createElement("canvas");
+ snapCanvas.width=video.videoWidth;
+ snapCanvas.height=video.videoHeight;
+ snapCanvas.getContext("2d").drawImage(video,0,0);
+ const link=document.createElement("a");
+ link.download="snapshot.png";
+ link.href=snapCanvas.toDataURL();
+ link.click();
+}
+
+function startMic(){
  navigator.mediaDevices.getUserMedia({audio:true})
  .then(stream=>{
-   output.innerHTML+="Microphone Active 🎤<br>";
+   audioStream=stream;
+   document.getElementById("output").innerHTML="Microphone Active 🎤";
  })
- .catch(()=>output.innerHTML+="Microphone Blocked ❌");
+ .catch(()=>document.getElementById("output").innerHTML="Mic Blocked ❌");
 }
 
 function systemInfo(){
- const output=document.getElementById("output");
- fetch("https://api.ipify.org?format=json")
- .then(res=>res.json())
- .then(data=>{
-   output.innerHTML=
-   "Public IP: "+data.ip+"<br>"+
-   "Platform: "+navigator.platform+"<br>"+
-   "User Agent: "+navigator.userAgent;
- });
+ document.getElementById("output").innerHTML=
+ "Platform: "+navigator.platform+"<br>"+
+ "User Agent: "+navigator.userAgent;
 }
 
 function wifiScan(){
@@ -159,9 +174,37 @@ function wifiScan(){
  });
 }
 
-function fbi(){
- document.body.style.background="red";
- screen.innerHTML="<h1>FBI WARNING 🚨</h1><br>Illegal Access Detected!";
+function terminal(){
+ const output=document.getElementById("output");
+ output.innerHTML="Terminal Ready<br><input id='cmd'>";
+ document.getElementById("cmd").focus();
+ document.getElementById("cmd").addEventListener("keydown",function(e){
+  if(e.key==="Enter"){
+   runCommand(this.value);
+  }
+ });
+}
+
+function runCommand(cmd){
+ const output=document.getElementById("output");
+ if(cmd==="help"){
+   output.innerHTML+="<br>Commands: help, clear, date, ip, exit";
+ }
+ else if(cmd==="clear"){
+   output.innerHTML="";
+ }
+ else if(cmd==="date"){
+   output.innerHTML+="<br>"+new Date();
+ }
+ else if(cmd==="ip"){
+   output.innerHTML+="<br>"+location.hostname;
+ }
+ else if(cmd==="exit"){
+   loadSystem();
+ }
+ else{
+   output.innerHTML+="<br>Unknown Command";
+ }
 }
 
 function shutdown(){
@@ -174,6 +217,5 @@ function restart(){
 
 passwordScreen();
 </script>
-
 </body>
 </html>
