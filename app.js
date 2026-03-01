@@ -37,11 +37,19 @@ function renderProducts() {
 
   products.forEach((p, index) => {
     container.innerHTML += `
-      <div style="margin-bottom:10px;">
-        ${p.name} - ${p.price} сом 
+      <div style="margin-bottom:15px;background:white;padding:12px;border-radius:12px;">
+        <strong>${p.name}</strong> - ${p.price} сом
         <br>📦 Калдык: ${p.qty}
-        <button onclick="sell(${index})" ${p.qty <= 0 ? "disabled" : ""}>
+
+        <button onclick="sell(${index})"
+          ${p.qty <= 0 ? "disabled" : ""}
+          style="margin-top:8px;background:#ffc107;padding:8px;border:none;border-radius:8px;">
           ${p.qty <= 0 ? "Түгөндү" : "Сатуу"}
+        </button>
+
+        <button onclick="removeProduct(${index})"
+          style="margin-top:8px;background:#e53935;color:white;padding:8px;border:none;border-radius:8px;">
+          🗑 Өчүрүү
         </button>
       </div>
     `;
@@ -59,4 +67,12 @@ function sell(index) {
 
   document.getElementById("total").textContent = total;
   renderProducts();
+}
+
+function removeProduct(index) {
+  if (confirm("Чын эле өчүрөсүзбү?")) {
+    products.splice(index, 1);
+    localStorage.setItem("products", JSON.stringify(products));
+    renderProducts();
+  }
 }
