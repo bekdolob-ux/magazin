@@ -1,67 +1,47 @@
+let products = JSON.parse(localStorage.getItem("products")) || [];
+let total = localStorage.getItem("total") || 0;
 
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #f3f3f3;
+document.getElementById("total").textContent = total;
+
+function login() {
+  const pin = document.getElementById("pinInput").value;
+  if (pin === "1234") {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    renderProducts();
+  } else {
+    alert("PIN туура эмес");
+  }
 }
 
-header {
-  background: #00a651;
-  color: white;
-  padding: 15px;
-  text-align: center;
+function addProduct() {
+  const name = document.getElementById("name").value;
+  const price = document.getElementById("price").value;
+
+  if (!name || !price) return;
+
+  products.push({ name, price: Number(price) });
+  localStorage.setItem("products", JSON.stringify(products));
+
+  renderProducts();
 }
 
-.search {
-  padding: 10px;
+function renderProducts() {
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+
+  products.forEach((p, index) => {
+    container.innerHTML += `
+      <div>
+        ${p.name} - ${p.price} сом
+        <button onclick="sell(${index})">Сатуу</button>
+      </div>
+    `;
+  });
 }
 
-.search input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 25px;
-  border: none;
-}
-
-.products {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 10px;
-}
-
-.card {
-  background: white;
-  width: 47%;
-  padding: 10px;
-  border-radius: 15px;
-}
-
-.card img {
-  width: 100%;
-  border-radius: 10px;
-}
-
-.price {
-  font-weight: bold;
-  color: #00a651;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  border-radius: 20px;
-  background: #ffd600;
-  border: none;
-  margin-top: 5px;
-}
-
-.cart {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #00a651;
-  color: white;
-  padding: 15px;
-  text-align: center;
+function sell(index) {
+  total = Number(total) + products[index].price;
+  localStorage.setItem("total", total);
+  document.getElementById("total").textContent = total;
 }
