@@ -1,85 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="ky">
 <head>
-<meta charset="UTF-8">
-<title>Full Red Screen</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-html,body{
-  width:100%;
-  height:100%;
-  background:red;
-  overflow:hidden;
-  font-family:monospace;
-  color:white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  text-align:center;
-}
-
-/* Титирөө */
-.shake{
-  animation:shake 0.08s infinite;
-}
-
-@keyframes shake{
-  0%{transform:translate(0,0);}
-  25%{transform:translate(6px,-6px);}
-  50%{transform:translate(-6px,6px);}
-  75%{transform:translate(6px,6px);}
-  100%{transform:translate(-6px,-6px);}
-}
-
-/* Жаркылдоо */
-@keyframes flash{
-  0%{opacity:1;}
-  50%{opacity:0.5;}
-  100%{opacity:1;}
-}
-
-.flash{
-  animation:flash 0.4s infinite;
-}
-
-h1{
-  font-size:32px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMarket Pro</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
 </head>
-<body class="shake flash">
+<body>
 
-<h1>🚨 SYSTEM FAILURE 🚨</h1>
-<p>Critical meltdown detected...</p>
+<header>
+  <h1>MMarket</h1>
+</header>
 
+<div class="search">
+  <input type="text" id="searchInput" placeholder="Товарларды издөө..." />
+</div>
+
+<div class="products" id="products"></div>
+
+<div class="cart">
+  🛒 Корзина: <span id="cartCount">0</span>
+</div>
+
+<script src="app.js"></script>
 <script>
-
-// Android вибрация
-if(navigator.vibrate){
-  setInterval(()=>{
-    navigator.vibrate([400,150,400]);
-  },2000);
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
 }
-
-// Сирена (биринчи тийгенде)
-let audio;
-document.body.addEventListener("click",function(){
-  if(!audio){
-    audio=new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
-    audio.loop=true;
-    audio.play();
-  }
-});
-
 </script>
 
 </body>
