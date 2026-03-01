@@ -2,25 +2,178 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FUN PHONE MODE</title>
-<link rel="stylesheet" href="style.css">
+<title>BekOS v4</title>
+<style>
+html,body{
+margin:0;
+padding:0;
+background:black;
+color:#00ff00;
+font-family:monospace;
+height:100%;
+overflow:hidden;
+}
+
+#screen{
+position:absolute;
+top:20px;
+left:20px;
+z-index:2;
+max-width:90%;
+}
+
+input{
+background:black;
+color:#00ff00;
+border:1px solid #00ff00;
+padding:5px;
+}
+
+button{
+background:black;
+color:#00ff00;
+border:1px solid #00ff00;
+padding:5px 10px;
+margin:5px;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+}
+</style>
 </head>
 <body>
 
-<h2>🔥 FUN PHONE MODE</h2>
+<canvas id="matrix"></canvas>
+<div id="screen"></div>
 
-<button onclick="startFun()">START</button>
+<script>
+// MATRIX
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
 
-<div id="freeze" class="hidden">
-    <h1>Loading...</h1>
-</div>
+function resize(){
+ canvas.width=window.innerWidth;
+ canvas.height=window.innerHeight;
+}
+resize();
+window.onresize=resize;
 
-<audio id="sound" src="music.mp3"></audio>
+const letters="01";
+const fontSize=14;
+let columns=Math.floor(canvas.width/fontSize);
+let drops=[];
 
-<video id="video" autoplay playsinline style="display:none;"></video>
-<canvas id="canvas" style="display:none;"></canvas>
+for(let i=0;i<columns;i++) drops[i]=1;
 
-<script src="app.js"></script>
+function draw(){
+ ctx.fillStyle="rgba(0,0,0,0.05)";
+ ctx.fillRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle="#0f0";
+ ctx.font=fontSize+"px monospace";
+
+ for(let i=0;i<drops.length;i++){
+   const text=letters[Math.floor(Math.random()*2)];
+   ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+   if(drops[i]*fontSize>canvas.height) drops[i]=0;
+   drops[i]++;
+ }
+}
+setInterval(draw,30);
+
+// SYSTEM
+const screen=document.getElementById("screen");
+
+function passwordScreen(){
+ screen.innerHTML="Enter Root Password:<br><input type='password' id='pass'><br>";
+ document.getElementById("pass").focus();
+ document.getElementById("pass").addEventListener("keydown",function(e){
+  if(e.key==="Enter"){
+    if(this.value==="bek002"){
+      loadSystem();
+    }else{
+      screen.innerHTML+="<br>ACCESS DENIED ❌";
+    }
+  }
+ });
+}
+
+function loadSystem(){
+ screen.innerHTML=
+ "BekOS v4.0<br><br>"+
+ "<button onclick='cameraHack()'>Camera</button>"+
+ "<button onclick='micHack()'>Microphone</button>"+
+ "<button onclick='systemInfo()'>System Info</button>"+
+ "<button onclick='wifiScan()'>WiFi Scan</button>"+
+ "<button onclick='fbi()'>FBI Mode</button>"+
+ "<button onclick='shutdown()'>Shutdown</button>"+
+ "<button onclick='restart()'>Restart</button><br><br>"+
+ "<div id='output'></div>";
+}
+
+function cameraHack(){
+ const output=document.getElementById("output");
+ output.innerHTML="Accessing Camera...<br>";
+ navigator.mediaDevices.getUserMedia({video:true})
+ .then(stream=>{
+   const video=document.createElement("video");
+   video.srcObject=stream;
+   video.autoplay=true;
+   video.style.width="300px";
+   output.innerHTML="Camera Active 📷<br>";
+   output.appendChild(video);
+ })
+ .catch(()=>output.innerHTML="Camera Blocked ❌");
+}
+
+function micHack(){
+ const output=document.getElementById("output");
+ output.innerHTML="Accessing Microphone...<br>";
+ navigator.mediaDevices.getUserMedia({audio:true})
+ .then(stream=>{
+   output.innerHTML+="Microphone Active 🎤<br>";
+ })
+ .catch(()=>output.innerHTML+="Microphone Blocked ❌");
+}
+
+function systemInfo(){
+ const output=document.getElementById("output");
+ fetch("https://api.ipify.org?format=json")
+ .then(res=>res.json())
+ .then(data=>{
+   output.innerHTML=
+   "Public IP: "+data.ip+"<br>"+
+   "Platform: "+navigator.platform+"<br>"+
+   "User Agent: "+navigator.userAgent;
+ });
+}
+
+function wifiScan(){
+ const output=document.getElementById("output");
+ output.innerHTML="Scanning WiFi...<br>";
+ let networks=["TP-Link_5G","AndroidAP","Home_WiFi","BekbolotNet"];
+ networks.forEach((n,i)=>{
+   setTimeout(()=>output.innerHTML+="Found: "+n+"<br>",i*500);
+ });
+}
+
+function fbi(){
+ document.body.style.background="red";
+ screen.innerHTML="<h1>FBI WARNING 🚨</h1><br>Illegal Access Detected!";
+}
+
+function shutdown(){
+ document.body.innerHTML="<h1 style='color:#0f0;text-align:center;margin-top:40vh;'>SYSTEM OFF</h1>";
+}
+
+function restart(){
+ location.reload();
+}
+
+passwordScreen();
+</script>
+
 </body>
 </html>
