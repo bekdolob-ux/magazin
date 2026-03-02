@@ -160,4 +160,3 @@ function editProduct(index) {
     localStorage.setItem("products", JSON.stringify(products));
     renderProducts();
   }
-}                        }
