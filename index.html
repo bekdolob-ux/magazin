@@ -32,7 +32,14 @@
   🛒 Даана: <span id="todayCount"></span>
 </div>
   <h2>🛒 Сатуу</h2>
-<div id="products"></div>
+  
+  <input type="text" 
+id="searchInput"
+placeholder="🔍 Товар издөө..."
+oninput="searchProduct()"
+style="width:100%;padding:12px;margin-bottom:10px;border-radius:10px;border:1px solid #ccc;">
+
+  <div id="products"></div> 
 <h2>🛒 Корзина</h2>
 <div id="cart"></div>
 
