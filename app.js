@@ -28,9 +28,10 @@ if (savedDate !== today) {
 let todaySales = Number(localStorage.getItem("todaySales")) || 0;
 let todayCount = Number(localStorage.getItem("todayCount")) || 0;
 let total = Number(localStorage.getItem("total")) || 0;
-
+let monthSales = Number(localStorage.getItem("monthSales")) || 0;
 // ===== UPDATE STATS =====
 function updateStats() {
+  
   document.getElementById("total").textContent = total;
   document.getElementById("todaySales").textContent = todaySales;
   document.getElementById("todayCount").textContent = todayCount;
