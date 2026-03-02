@@ -1,5 +1,21 @@
+// ===== LOGIN =====
+function login() {
+  const pin = document.getElementById("pinInput").value.trim();
+
+  if (pin === "0000") {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    renderProducts();
+    updateStats();
+  } else {
+    alert("PIN туура эмес");
+  }
+}
+
+// ===== DATA =====
 let products = JSON.parse(localStorage.getItem("products")) || [];
 let cart = [];
+
 let today = new Date().toLocaleDateString();
 let savedDate = localStorage.getItem("todayDate");
 
@@ -11,22 +27,16 @@ if (savedDate !== today) {
 
 let todaySales = Number(localStorage.getItem("todaySales")) || 0;
 let todayCount = Number(localStorage.getItem("todayCount")) || 0;
-let total = localStorage.getItem("total") || 0;
+let total = Number(localStorage.getItem("total")) || 0;
 
-document.getElementById("total").textContent = total;
-document.getElementById("todaySales").textContent = todaySales;
-document.getElementById("todayCount").textContent = todayCount;
-function login() {
-  const pin = document.getElementById("pinInput").value;
-  if (pin === "0000") {
-    document.getElementById("login").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    renderProducts();
-  } else {
-    alert("PIN туура эмес");
-  }
+// ===== UPDATE STATS =====
+function updateStats() {
+  document.getElementById("total").textContent = total;
+  document.getElementById("todaySales").textContent = todaySales;
+  document.getElementById("todayCount").textContent = todayCount;
 }
 
+// ===== ADD PRODUCT =====
 function addProduct() {
   const name = document.getElementById("name").value;
   const price = document.getElementById("price").value;
@@ -44,6 +54,7 @@ function addProduct() {
   renderProducts();
 }
 
+// ===== RENDER PRODUCTS =====
 function renderProducts() {
   const container = document.getElementById("products");
   container.innerHTML = "";
@@ -57,9 +68,9 @@ function renderProducts() {
       <br>📦 Калдык: ${p.qty}
      
       <br>
-<span style="font-weight:bold;color:${p.qty === 0 ? 'red' : p.qty <= 2 ? 'orange' : 'green'}">
-${p.qty === 0 ? '🔴 Жок' : p.qty <= 2 ? '🟡 Аз калды' : '🟢 Бар'}
-</span>
+      <span style="font-weight:bold;color:${p.qty === 0 ? 'red' : p.qty <= 2 ? 'orange' : 'green'}">
+        ${p.qty === 0 ? '🔴 Жок' : p.qty <= 2 ? '🟡 Аз калды' : '🟢 Бар'}
+      </span>
 
       <br>
 
@@ -73,32 +84,33 @@ ${p.qty === 0 ? '🔴 Жок' : p.qty <= 2 ? '🟡 Аз калды' : '🟢 Ба
         style="margin-top:8px;background:#e53935;color:white;padding:8px;border:none;border-radius:8px;">
         🗑 Өчүрүү
       </button>
-<button onclick="editProduct(${index})"
-  style="margin-top:8px;background:#2196f3;color:white;padding:8px;border:none;border-radius:8px;">
-  ✏️ Өзгөртүү
-</button>
+
+      <button onclick="editProduct(${index})"
+        style="margin-top:8px;background:#2196f3;color:white;padding:8px;border:none;border-radius:8px;">
+        ✏️ Өзгөртүү
+      </button>
     </div>
     `;
   });
 }
 
+// ===== SELL =====
 function sell(index) {
   if (products[index].qty <= 0) return;
 
-  // складдан 1 азайтат
   products[index].qty -= 1;
 
-  // корзинага кошот
   cart.push({
     name: products[index].name,
     price: products[index].price
   });
 
   localStorage.setItem("products", JSON.stringify(products));
-
   renderProducts();
   renderCart();
 }
+
+// ===== RENDER CART =====
 function renderCart() {
   const cartDiv = document.getElementById("cart");
   const totalSpan = document.getElementById("cartTotal");
@@ -118,6 +130,8 @@ function renderCart() {
 
   totalSpan.textContent = sum;
 }
+
+// ===== CHECKOUT =====
 function checkout() {
   if (cart.length === 0) {
     alert("Корзина бош");
@@ -126,7 +140,7 @@ function checkout() {
 
   let sum = cart.reduce((a, b) => a + b.price, 0);
 
-  total = Number(total) + sum;
+  total += sum;
   todaySales += sum;
   todayCount += cart.length;
 
@@ -134,31 +148,13 @@ function checkout() {
   localStorage.setItem("todaySales", todaySales);
   localStorage.setItem("todayCount", todayCount);
 
-  document.getElementById("total").textContent = total;
-  document.getElementById("todaySales").textContent = todaySales;
-  document.getElementById("todayCount").textContent = todayCount;
+  updateStats();
 
   cart = [];
   renderCart();
 }
-function removeProduct(index) {
-    if (confirm("Чын эле өчүрөсүзбү?")) {
-        products.splice(index, 1);
-        localStorage.setItem("products", JSON.stringify(products));
-        renderProducts();
-    }
-function editProduct(index) {
-  const newName = prompt("Жаңы атын жазыңыз:", products[index].name);
-  const newPrice = prompt("Жаңы баасын жазыңыз:", products[index].price);
-  const newQty = prompt("Жаңы санын жазыңыз:", products[index].qty);
 
-  if (newName !== null && newPrice !== null && newQty !== null) {
-    products[index].name = newName;
-    products[index].price = Number(newPrice);
-    products[index].qty = Number(newQty);
-
-    localStorage.setItem("products", JSON.stringify(products));
-    renderProducts();
+// ===== REMOVE PRODUCT =====
 function removeProduct(index) {
   if (confirm("Чын эле өчүрөсүзбү?")) {
     products.splice(index, 1);
@@ -167,6 +163,7 @@ function removeProduct(index) {
   }
 }
 
+// ===== EDIT PRODUCT =====
 function editProduct(index) {
   const newName = prompt("Жаңы атын жазыңыз:", products[index].name);
   const newPrice = prompt("Жаңы баасын жазыңыз:", products[index].price);
@@ -181,4 +178,3 @@ function editProduct(index) {
     renderProducts();
   }
 }
-  
