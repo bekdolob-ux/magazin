@@ -164,17 +164,22 @@ function removeProduct(index) {
 }
 
 // ===== EDIT PRODUCT =====
-function editProduct(index) {
-  const newName = prompt("Жаңы атын жазыңыз:", products[index].name);
-  const newPrice = prompt("Жаңы баасын жазыңыз:", products[index].price);
-  const newQty = prompt("Жаңы санын жазыңыз:", products[index].qty);
+function searchProduct() {
+  const value = document.getElementById("searchInput").value.toLowerCase();
+  const container = document.getElementById("products");
+  container.innerHTML = "";
 
-  if (newName !== null && newPrice !== null && newQty !== null) {
-    products[index].name = newName;
-    products[index].price = Number(newPrice);
-    products[index].qty = Number(newQty);
-
-    localStorage.setItem("products", JSON.stringify(products));
-    renderProducts();
-  }
+  products
+    .filter(p => 
+      p.name.toLowerCase().includes(value) ||
+      p.price.toString().includes(value)
+    )
+    .forEach((p, index) => {
+      container.innerHTML += `
+        <div style="margin-bottom:15px;background:white;padding:12px;border-radius:12px;">
+          <strong>${p.name}</strong> - ${p.price} сом
+          <br>📦 Калдык: ${p.qty}
+        </div>
+      `;
+    });
 }
