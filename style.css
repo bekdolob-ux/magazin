@@ -61,3 +61,21 @@ p {
   font-weight: bold;
   color: #00a651;
 }
+.add-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #00c853, #009624);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.add-btn:active {
+    transform: scale(0.97);
+}
