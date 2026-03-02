@@ -138,3 +138,10 @@ function checkout() {
   cart = [];
   renderCart();
 }
+function removeProduct(index) {
+    if (confirm("Чын эле өчүрөсүзбү?")) {
+        products.splice(index, 1);
+        localStorage.setItem("products", JSON.stringify(products));
+        renderProducts();
+    }
+                        }
