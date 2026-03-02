@@ -73,7 +73,10 @@ ${p.qty === 0 ? '🔴 Жок' : p.qty <= 2 ? '🟡 Аз калды' : '🟢 Ба
         style="margin-top:8px;background:#e53935;color:white;padding:8px;border:none;border-radius:8px;">
         🗑 Өчүрүү
       </button>
-
+<button onclick="editProduct(${index})"
+  style="margin-top:8px;background:#2196f3;color:white;padding:8px;border:none;border-radius:8px;">
+  ✏️ Өзгөртүү
+</button>
     </div>
     `;
   });
