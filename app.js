@@ -68,7 +68,9 @@ ${p.qty === 0 ? '🔴 Жок' : p.qty <= 2 ? '🟡 Аз калды' : '🟢 Ба
         style="margin-top:8px;background:#ffc107;padding:8px;border:none;border-radius:8px;">
         ${p.qty <= 0 ? "Түгөндү" : "Сатуу"}
       </button>
+<button onclick="sell(${index})" ...>Сатуу</button>
 
+<button onclick="removeProduct(${index})" ...>🗑 Өчүрүү</button>
       <button onclick="removeProduct(${index})"
         style="margin-top:8px;background:#e53935;color:white;padding:8px;border:none;border-radius:8px;">
         🗑 Өчүрүү
@@ -144,4 +146,17 @@ function removeProduct(index) {
         localStorage.setItem("products", JSON.stringify(products));
         renderProducts();
     }
-                        }
+function editProduct(index) {
+  const newName = prompt("Жаңы атын жазыңыз:", products[index].name);
+  const newPrice = prompt("Жаңы баасын жазыңыз:", products[index].price);
+  const newQty = prompt("Жаңы санын жазыңыз:", products[index].qty);
+
+  if (newName !== null && newPrice !== null && newQty !== null) {
+    products[index].name = newName;
+    products[index].price = Number(newPrice);
+    products[index].qty = Number(newQty);
+
+    localStorage.setItem("products", JSON.stringify(products));
+    renderProducts();
+  }
+}                        }
