@@ -18,7 +18,7 @@ document.getElementById("todaySales").textContent = todaySales;
 document.getElementById("todayCount").textContent = todayCount;
 function login() {
   const pin = document.getElementById("pinInput").value;
-  if (pin === "1234") {
+  if (pin === "0000") {
     document.getElementById("login").style.display = "none";
     document.getElementById("app").style.display = "block";
     renderProducts();
