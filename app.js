@@ -159,5 +159,26 @@ function editProduct(index) {
 
     localStorage.setItem("products", JSON.stringify(products));
     renderProducts();
+function removeProduct(index) {
+  if (confirm("Чын эле өчүрөсүзбү?")) {
+    products.splice(index, 1);
+    localStorage.setItem("products", JSON.stringify(products));
+    renderProducts();
   }
 }
+
+function editProduct(index) {
+  const newName = prompt("Жаңы атын жазыңыз:", products[index].name);
+  const newPrice = prompt("Жаңы баасын жазыңыз:", products[index].price);
+  const newQty = prompt("Жаңы санын жазыңыз:", products[index].qty);
+
+  if (newName !== null && newPrice !== null && newQty !== null) {
+    products[index].name = newName;
+    products[index].price = Number(newPrice);
+    products[index].qty = Number(newQty);
+
+    localStorage.setItem("products", JSON.stringify(products));
+    renderProducts();
+  }
+}
+  
