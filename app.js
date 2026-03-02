@@ -68,9 +68,7 @@ ${p.qty === 0 ? '🔴 Жок' : p.qty <= 2 ? '🟡 Аз калды' : '🟢 Ба
         style="margin-top:8px;background:#ffc107;padding:8px;border:none;border-radius:8px;">
         ${p.qty <= 0 ? "Түгөндү" : "Сатуу"}
       </button>
-<button onclick="sell(${index})" ...>Сатуу</button>
 
-<button onclick="removeProduct(${index})" ...>🗑 Өчүрүү</button>
       <button onclick="removeProduct(${index})"
         style="margin-top:8px;background:#e53935;color:white;padding:8px;border:none;border-radius:8px;">
         🗑 Өчүрүү
