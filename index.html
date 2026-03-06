@@ -2,99 +2,200 @@
 <html lang="ky">
 <head>
 <meta charset="UTF-8">
-<title>Self Service Kassa</title>
+<title>Self Checkout Kassa</title>
 
 <style>
 body{
-font-family: Arial;
-background:#111;
+font-family:Arial;
+background:#0f172a;
 color:white;
+margin:0;
+}
+
+.header{
+background:#111827;
+padding:20px;
+font-size:28px;
 text-align:center;
 }
 
-h1{
-margin:20px;
+.container{
+display:flex;
+}
+
+.categories{
+width:25%;
+background:#1f2937;
+padding:10px;
+}
+
+.cat{
+background:#374151;
+margin:10px;
+padding:20px;
+font-size:20px;
+border-radius:10px;
+cursor:pointer;
+text-align:center;
 }
 
 .products{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:20px;
+width:45%;
 padding:20px;
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
 }
 
-button{
-font-size:25px;
-padding:30px;
-border:none;
-border-radius:15px;
-background:#2ecc71;
-color:white;
+.product{
+background:#2563eb;
+padding:25px;
+border-radius:10px;
+font-size:20px;
+text-align:center;
+cursor:pointer;
 }
 
-button:active{
-background:#27ae60;
+.cart{
+width:30%;
+background:#111827;
+padding:20px;
 }
 
 .total{
-font-size:40px;
-margin:20px;
+font-size:30px;
+margin-top:20px;
+}
+
+button{
+width:100%;
+padding:15px;
+font-size:20px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+cursor:pointer;
 }
 
 .pay{
-background:#e74c3c;
-font-size:35px;
-padding:25px;
+background:#16a34a;
 }
 
 .reset{
-background:#3498db;
-font-size:25px;
-padding:20px;
+background:#ef4444;
 }
 </style>
 </head>
 
 <body>
 
-<h1>ӨЗҮН ӨЗҮ ТЕЙЛӨӨ КАССА</h1>
-
-<div class="products">
-
-<button onclick="add(25)">Нан<br>25 сом</button>
-<button onclick="add(40)">Суу<br>40 сом</button>
-<button onclick="add(120)">Шоколад<br>120 сом</button>
-
-<button onclick="add(60)">Кола<br>60 сом</button>
-<button onclick="add(80)">Чипсы<br>80 сом</button>
-<button onclick="add(150)">Май<br>150 сом</button>
-
+<div class="header">
+SELF CHECKOUT КАССА
 </div>
+
+<div class="container">
+
+<div class="categories">
+<div class="cat" onclick="showCat('bread')">Нан</div>
+<div class="cat" onclick="showCat('drink')">Суусундук</div>
+<div class="cat" onclick="showCat('sweet')">Таттуу</div>
+</div>
+
+<div class="products" id="products"></div>
+
+<div class="cart">
+<h3>Корзина</h3>
+<div id="cart"></div>
 
 <div class="total">
 Жалпы: <span id="sum">0</span> сом
 </div>
 
 <button class="pay" onclick="pay()">ТӨЛӨӨ</button>
-<br><br>
-<button class="reset" onclick="reset()">ЖАҢЫ ЗАКАЗ</button>
+<button class="reset" onclick="resetCart()">ЖАҢЫ</button>
+</div>
+
+</div>
 
 <script>
 
 let total = 0
+let cart = []
 
-function add(price){
-total += price
-document.getElementById("sum").innerText = total
+const products = {
+
+bread:[
+{name:"Нан",price:25},
+{name:"Батон",price:35}
+],
+
+drink:[
+{name:"Суу",price:40},
+{name:"Кола",price:60}
+],
+
+sweet:[
+{name:"Шоколад",price:120},
+{name:"Чипсы",price:80}
+]
+
+}
+
+function showCat(cat){
+
+let html=""
+
+products[cat].forEach(p=>{
+html+=`
+<div class="product" onclick="add('${p.name}',${p.price})">
+${p.name}<br>${p.price} сом
+</div>
+`
+})
+
+document.getElementById("products").innerHTML=html
+}
+
+function add(name,price){
+
+cart.push({name,price})
+
+total+=price
+
+updateCart()
+
+}
+
+function updateCart(){
+
+let html=""
+
+cart.forEach(i=>{
+html+=i.name+" - "+i.price+" сом<br>"
+})
+
+document.getElementById("cart").innerHTML=html
+document.getElementById("sum").innerText=total
+
 }
 
 function pay(){
-alert("Төлөө суммасы: " + total + " сом")
+
+alert("Төлөндү: "+total+" сом")
+
+window.print()
+
+resetCart()
+
 }
 
-function reset(){
-total = 0
-document.getElementById("sum").innerText = total
+function resetCart(){
+
+cart=[]
+total=0
+
+updateCart()
+
 }
 
 </script>
