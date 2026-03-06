@@ -2,220 +2,101 @@
 <html lang="ky">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BEKBOLOT PRO POS</title>
+<title>Self Service Kassa</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0f172a;color:white}
-header{background:#111827;padding:15px;text-align:center;color:#00ffcc;font-size:20px}
-nav{display:flex;background:#1e293b}
-nav button{flex:1;padding:15px;border:none;background:#1e293b;color:white;font-weight:bold}
-nav button.active{background:#00ffcc;color:black}
-.section{display:none;padding:15px}
-.card{background:#1e293b;padding:15px;border-radius:10px;margin-bottom:15px}
-input,select{padding:8px;margin:5px;border:none;border-radius:6px}
-button.main{background:#00ffcc;padding:10px;border:none;border-radius:8px;font-weight:bold}
-.product-btn{margin:5px;padding:12px;background:#00ffcc;border:none;border-radius:8px;font-weight:bold}
-.receipt{background:white;color:black;padding:15px;border-radius:8px;margin-top:10px;font-family:monospace;white-space:pre-line}
-.low{color:orange}
-.zero{color:red}
+body{
+font-family: Arial;
+background:#111;
+color:white;
+text-align:center;
+}
+
+h1{
+margin:20px;
+}
+
+.products{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+padding:20px;
+}
+
+button{
+font-size:25px;
+padding:30px;
+border:none;
+border-radius:15px;
+background:#2ecc71;
+color:white;
+}
+
+button:active{
+background:#27ae60;
+}
+
+.total{
+font-size:40px;
+margin:20px;
+}
+
+.pay{
+background:#e74c3c;
+font-size:35px;
+padding:25px;
+}
+
+.reset{
+background:#3498db;
+font-size:25px;
+padding:20px;
+}
 </style>
 </head>
+
 <body>
 
-<header>📦 BEKBOLOT MARKET PRO</header>
+<h1>ӨЗҮН ӨЗҮ ТЕЙЛӨӨ КАССА</h1>
 
-<nav>
-<button onclick="show('stock')" id="btnStock" class="active">📦 Склад</button>
-<button onclick="show('cash')" id="btnCash">🛒 Касса</button>
-<button onclick="show('report')" id="btnReport">📊 Отчет</button>
-</nav>
+<div class="products">
 
-<div id="stock" class="section" style="display:block">
-<div class="card">
-<h3>➕ Товар кошуу</h3>
-<input id="name" placeholder="Аты">
-<input id="buy" type="number" placeholder="Сатып алуу">
-<input id="sell" type="number" placeholder="Сатуу баа">
-<input id="qty" type="number" placeholder="Саны">
-<select id="category">
-<option>Напиток</option>
-<option>Шоколад</option>
-<option>Антифриз</option>
-<option>Башка</option>
-</select>
-<button class="main" onclick="addProduct()">Кош</button>
+<button onclick="add(25)">Нан<br>25 сом</button>
+<button onclick="add(40)">Суу<br>40 сом</button>
+<button onclick="add(120)">Шоколад<br>120 сом</button>
+
+<button onclick="add(60)">Кола<br>60 сом</button>
+<button onclick="add(80)">Чипсы<br>80 сом</button>
+<button onclick="add(150)">Май<br>150 сом</button>
+
 </div>
 
-<div id="stockList"></div>
+<div class="total">
+Жалпы: <span id="sum">0</span> сом
 </div>
 
-<div id="cash" class="section">
-<div class="card">
-<h3>🛒 Товар тандоо</h3>
-<div id="cashProducts"></div>
-</div>
-
-<div class="card">
-<h3>📋 Корзина</h3>
-<div id="cart"></div>
-<h3 id="total">ЖАЛПЫ: 0 сом</h3>
-<button class="main" onclick="checkout()">🧾 Чек</button>
-<button onclick="newSale()">🔄 Жаңы чек</button>
-<div id="receiptBox"></div>
-</div>
-</div>
-
-<div id="report" class="section">
-<div class="card">
-<h3>📊 Күнүмдүк отчет</h3>
-<div id="reportData"></div>
-</div>
-</div>
+<button class="pay" onclick="pay()">ТӨЛӨӨ</button>
+<br><br>
+<button class="reset" onclick="reset()">ЖАҢЫ ЗАКАЗ</button>
 
 <script>
 
-let products = JSON.parse(localStorage.getItem("products")) || [];
-let cart = {};
-let receiptNo = parseInt(localStorage.getItem("receiptNo")) || 1;
-let dailyRevenue = parseFloat(localStorage.getItem("dailyRevenue")) || 0;
-let dailyItems = parseInt(localStorage.getItem("dailyItems")) || 0;
+let total = 0
 
-/* Авто күн reset */
-let today = new Date().toDateString();
-let savedDate = localStorage.getItem("savedDate");
-if(savedDate !== today){
-dailyRevenue = 0;
-dailyItems = 0;
-localStorage.setItem("savedDate", today);
+function add(price){
+total += price
+document.getElementById("sum").innerText = total
 }
 
-function save(){
-localStorage.setItem("products",JSON.stringify(products));
-localStorage.setItem("receiptNo",receiptNo);
-localStorage.setItem("dailyRevenue",dailyRevenue);
-localStorage.setItem("dailyItems",dailyItems);
+function pay(){
+alert("Төлөө суммасы: " + total + " сом")
 }
 
-function show(id){
-document.querySelectorAll(".section").forEach(s=>s.style.display="none");
-document.getElementById(id).style.display="block";
-document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-document.getElementById("btn"+id.charAt(0).toUpperCase()+id.slice(1)).classList.add("active");
-render();
+function reset(){
+total = 0
+document.getElementById("sum").innerText = total
 }
 
-function addProduct(){
-let name=document.getElementById("name").value;
-let buy=parseFloat(document.getElementById("buy").value);
-let sell=parseFloat(document.getElementById("sell").value);
-let qty=parseInt(document.getElementById("qty").value);
-let category=document.getElementById("category").value;
-
-if(!name||!buy||!sell||!qty)return alert("Толтур!");
-
-products.push({name,buy,sell,qty,category});
-save();
-render();
-}
-
-function render(){
-renderStock();
-renderCash();
-renderCart();
-renderReport();
-}
-
-function renderStock(){
-let div=document.getElementById("stockList");
-div.innerHTML="";
-products.forEach(p=>{
-let cls="";
-if(p.qty==0) cls="zero";
-else if(p.qty<=5) cls="low";
-div.innerHTML+=`<div class="${cls}">${p.name} - ${p.qty} даана (${p.sell} сом)</div>`;
-});
-}
-
-function renderCash(){
-let div=document.getElementById("cashProducts");
-div.innerHTML="";
-products.forEach((p,i)=>{
-if(p.qty>0){
-div.innerHTML+=`
-<button class="product-btn" onclick="addToCart(${i})">
-${p.name}<br>${p.sell} сом
-</button>`;
-}
-});
-}
-
-function addToCart(i){
-let p=products[i];
-if(p.qty<=0)return;
-if(!cart[i]) cart[i]={...p,qty:0,index:i};
-cart[i].qty++;
-renderCart();
-}
-
-function renderCart(){
-let div=document.getElementById("cart");
-div.innerHTML="";
-let total=0;
-
-for(let key in cart){
-let item=cart[key];
-let sum=item.qty*item.sell;
-total+=sum;
-div.innerHTML+=`${item.name} ${item.qty} x ${item.sell} = ${sum}<br>`;
-}
-
-document.getElementById("total").innerText="ЖАЛПЫ: "+total+" сом";
-}
-
-function checkout(){
-if(Object.keys(cart).length===0)return alert("Корзина бош!");
-
-let total=0;
-let receipt="BEKBOLOT MARKET\nЧек №:"+receiptNo+"\n----------------\n";
-
-for(let key in cart){
-let item=cart[key];
-let sum=item.qty*item.sell;
-total+=sum;
-products[item.index].qty-=item.qty;
-dailyItems+=item.qty;
-receipt+=`${item.name} ${item.qty} x ${item.sell} = ${sum}\n`;
-}
-
-dailyRevenue+=total;
-
-receipt+="----------------\nЖАЛПЫ:"+total+" сом\nРахмат!\n";
-
-document.getElementById("receiptBox").innerHTML=
-'<div class="receipt">'+receipt+'</div>';
-
-cart={};
-receiptNo++;
-save();
-render();
-}
-
-function newSale(){
-cart={};
-document.getElementById("receiptBox").innerHTML="";
-renderCart();
-}
-
-function renderReport(){
-let div=document.getElementById("reportData");
-div.innerHTML=`
-💰 Түшкөн акча: ${dailyRevenue} сом<br>
-📦 Сатылган товар: ${dailyItems} даана
-`;
-}
-
-render();
 </script>
 
 </body>
