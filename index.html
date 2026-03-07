@@ -1,200 +1,184 @@
 <!DOCTYPE html>
-<html lang="ky">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Self Checkout Kassa</title>
+<title>Smart Store Assistant</title>
 
 <style>
+
 body{
 font-family:Arial;
-background:#0f172a;
+background:#111;
 color:white;
-margin:0;
-}
-
-.header{
-background:#111827;
-padding:20px;
-font-size:28px;
 text-align:center;
 }
 
-.container{
-display:flex;
+h1{
+font-size:40px;
 }
 
-.categories{
-width:25%;
-background:#1f2937;
-padding:10px;
-}
-
-.cat{
-background:#374151;
-margin:10px;
-padding:20px;
+#search{
 font-size:20px;
-border-radius:10px;
-cursor:pointer;
-text-align:center;
-}
-
-.products{
-width:45%;
-padding:20px;
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:15px;
+padding:10px;
+width:300px;
+margin:20px;
 }
 
 .product{
-background:#2563eb;
-padding:25px;
-border-radius:10px;
-font-size:20px;
-text-align:center;
-cursor:pointer;
-}
-
-.cart{
-width:30%;
-background:#111827;
+display:inline-block;
+background:#222;
 padding:20px;
+margin:15px;
+border-radius:10px;
+width:200px;
 }
 
-.total{
-font-size:30px;
-margin-top:20px;
+img{
+width:120px;
+height:120px;
 }
 
 button{
-width:100%;
-padding:15px;
-font-size:20px;
+font-size:18px;
+padding:10px;
 margin-top:10px;
-border:none;
-border-radius:8px;
-cursor:pointer;
+width:150px;
 }
 
-.pay{
-background:#16a34a;
+#cart{
+margin-top:30px;
+font-size:22px;
 }
 
-.reset{
-background:#ef4444;
-}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-SELF CHECKOUT КАССА
-</div>
+<h1>Ассистент магазина</h1>
 
-<div class="container">
+<input id="search" placeholder="Поиск товара">
 
-<div class="categories">
-<div class="cat" onclick="showCat('bread')">Нан</div>
-<div class="cat" onclick="showCat('drink')">Суусундук</div>
-<div class="cat" onclick="showCat('sweet')">Таттуу</div>
-</div>
+<div id="products"></div>
 
-<div class="products" id="products"></div>
+<h2>Корзина</h2>
 
-<div class="cart">
-<h3>Корзина</h3>
 <div id="cart"></div>
 
-<div class="total">
-Жалпы: <span id="sum">0</span> сом
-</div>
+<h2 id="total">Итого: 0 сом</h2>
 
-<button class="pay" onclick="pay()">ТӨЛӨӨ</button>
-<button class="reset" onclick="resetCart()">ЖАҢЫ</button>
-</div>
-
-</div>
+<button onclick="pay()">Оплатить</button>
+<button onclick="clearCart()">Очистить</button>
 
 <script>
 
-let total = 0
-let cart = []
+let products = [
 
-const products = {
+{
+name:"Coca Cola",
+price:85,
+image:"https://upload.wikimedia.org/wikipedia/commons/1/1b/Coca-Cola_bottle.jpg"
+},
 
-bread:[
-{name:"Нан",price:25},
-{name:"Батон",price:35}
-],
+{
+name:"Snickers",
+price:60,
+image:"https://upload.wikimedia.org/wikipedia/commons/9/92/Snickers_bars.jpg"
+},
 
-drink:[
-{name:"Суу",price:40},
-{name:"Кола",price:60}
-],
+{
+name:"Green Tea",
+price:120,
+image:"https://upload.wikimedia.org/wikipedia/commons/0/04/Tea.jpg"
+},
 
-sweet:[
-{name:"Шоколад",price:120},
-{name:"Чипсы",price:80}
+{
+name:"Pepsi",
+price:80,
+image:"https://upload.wikimedia.org/wikipedia/commons/6/68/Pepsi_can.jpg"
+}
+
 ]
+
+let total = 0
+
+function speak(text){
+
+let speech = new SpeechSynthesisUtterance(text)
+
+speech.lang = "ru-RU"
+
+speechSynthesis.speak(speech)
 
 }
 
-function showCat(cat){
+function render(){
 
 let html=""
 
-products[cat].forEach(p=>{
-html+=`
-<div class="product" onclick="add('${p.name}',${p.price})">
-${p.name}<br>${p.price} сом
+products.forEach(p=>{
+
+html += `
+
+<div class="product">
+
+<img src="${p.image}"><br>
+
+<b>${p.name}</b><br>
+
+${p.price} сом<br>
+
+<button onclick="add('${p.name}',${p.price})">Добавить</button>
+
 </div>
+
 `
+
 })
 
-document.getElementById("products").innerHTML=html
+document.getElementById("products").innerHTML = html
+
 }
+
+render()
 
 function add(name,price){
 
-cart.push({name,price})
+total += price
 
-total+=price
+document.getElementById("cart").innerHTML += name+" - "+price+" сом<br>"
 
-updateCart()
+document.getElementById("total").innerText="Итого: "+total+" сом"
 
-}
-
-function updateCart(){
-
-let html=""
-
-cart.forEach(i=>{
-html+=i.name+" - "+i.price+" сом<br>"
-})
-
-document.getElementById("cart").innerHTML=html
-document.getElementById("sum").innerText=total
+speak("Товар добавлен в корзину")
 
 }
 
 function pay(){
 
-alert("Төлөндү: "+total+" сом")
+speak("Спасибо за покупку")
 
-window.print()
+alert("Спасибо за покупку")
 
-resetCart()
+print()
+
+total = 0
+
+document.getElementById("cart").innerHTML=""
+
+document.getElementById("total").innerText="Итого: 0 сом"
 
 }
 
-function resetCart(){
+function clearCart(){
 
-cart=[]
 total=0
 
-updateCart()
+document.getElementById("cart").innerHTML=""
+
+document.getElementById("total").innerText="Итого: 0 сом"
+
+speak("Корзина очищена")
 
 }
 
