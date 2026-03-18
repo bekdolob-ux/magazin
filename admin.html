@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Админ панель</title><style>
+body{margin:0;font-family:Arial;background:#0b0f19;color:white}
+.container{padding:20px}
+input,textarea{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:none}
+button{padding:12px;background:#22c55e;border:none;border-radius:10px;width:100%}
+</style></head><body><div class="container">
+<h2>🔐 Админ панель</h2><input id="name" placeholder="Аты">
+<input id="city" placeholder="Шаар">
+<input id="img" placeholder="Сүрөт ссылка">
+<textarea id="work" placeholder="Кылган иштери"></textarea>
+<input id="phone" placeholder="WhatsApp номер (996...)"><button onclick="save()">Кошуу</button>
+
+</div><script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "СЕНИН_KEY",
+  authDomain: "СЕНИН",
+  databaseURL: "СЕНИН",
+  projectId: "СЕНИН"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.save = function () {
+  let data = {
+    name: name.value,
+    city: city.value,
+    img: img.value,
+    work: work.value,
+    phone: phone.value
+  };
+
+  push(ref(db, "masters"), data);
+  alert("Кошулду ✅");
+}
+</script></body>
+</html>
