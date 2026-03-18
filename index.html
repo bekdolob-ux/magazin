@@ -1,188 +1,48 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html lang="ky">
 <head>
 <meta charset="UTF-8">
-<title>Smart Store Assistant</title>
-
-<style>
-
-body{
-font-family:Arial;
-background:#111;
-color:white;
-text-align:center;
-}
-
-h1{
-font-size:40px;
-}
-
-#search{
-font-size:20px;
-padding:10px;
-width:300px;
-margin:20px;
-}
-
-.product{
-display:inline-block;
-background:#222;
-padding:20px;
-margin:15px;
-border-radius:10px;
-width:200px;
-}
-
-img{
-width:120px;
-height:120px;
-}
-
-button{
-font-size:18px;
-padding:10px;
-margin-top:10px;
-width:150px;
-}
-
-#cart{
-margin-top:30px;
-font-size:22px;
-}
-
-</style>
-</head>
-
-<body>
-
-<h1>Ассистент магазина</h1>
-
-<input id="search" placeholder="Поиск товара">
-
-<div id="products"></div>
-
-<h2>Корзина</h2>
-
-<div id="cart"></div>
-
-<h2 id="total">Итого: 0 сом</h2>
-
-<button onclick="pay()">Оплатить</button>
-<button onclick="clearCart()">Очистить</button>
-
-<script>
-
-let products = [
-
-{
-name:"Coca Cola",
-price:85,
-image:"https://upload.wikimedia.org/wikipedia/commons/1/1b/Coca-Cola_bottle.jpg"
-},
-
-{
-name:"Snickers",
-price:60,
-image:"https://upload.wikimedia.org/wikipedia/commons/9/92/Snickers_bars.jpg"
-},
-
-{
-name:"Green Tea",
-price:120,
-image:"https://upload.wikimedia.org/wikipedia/commons/0/04/Tea.jpg"
-},
-
-{
-name:"Pepsi",
-price:80,
-image:"https://upload.wikimedia.org/wikipedia/commons/6/68/Pepsi_can.jpg"
-}
-
-]
-
-let total = 0
-
-function speak(text){
-
-let speech = new SpeechSynthesisUtterance(text)
-
-speech.lang = "ru-RU"
-
-speechSynthesis.speak(speech)
-
-}
-
-function render(){
-
-let html=""
-
-products.forEach(p=>{
-
-html += `
-
-<div class="product">
-
-<img src="${p.image}"><br>
-
-<b>${p.name}</b><br>
-
-${p.price} сом<br>
-
-<button onclick="add('${p.name}',${p.price})">Добавить</button>
-
-</div>
-
-`
-
-})
-
-document.getElementById("products").innerHTML = html
-
-}
-
-render()
-
-function add(name,price){
-
-total += price
-
-document.getElementById("cart").innerHTML += name+" - "+price+" сом<br>"
-
-document.getElementById("total").innerText="Итого: "+total+" сом"
-
-speak("Товар добавлен в корзину")
-
-}
-
-function pay(){
-
-speak("Спасибо за покупку")
-
-alert("Спасибо за покупку")
-
-print()
-
-total = 0
-
-document.getElementById("cart").innerHTML=""
-
-document.getElementById("total").innerText="Итого: 0 сом"
-
-}
-
-function clearCart(){
-
-total=0
-
-document.getElementById("cart").innerHTML=""
-
-document.getElementById("total").innerText="Итого: 0 сом"
-
-speak("Корзина очищена")
-
-}
-
-</script>
-
-</body>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ Электрик</title><style>
+body{margin:0;font-family:Arial;background:#0b0f19;color:white}
+header{text-align:center;padding:15px;font-size:20px}
+.container{padding:15px}
+.card{background:#121826;border-radius:15px;padding:15px;margin-bottom:20px}
+.card img{width:100%;border-radius:10px}
+.title{font-size:20px}
+.city{color:#9ca3af}
+.work{margin:5px 0}
+.whatsapp{background:#22c55e;padding:10px;border-radius:10px;color:black;text-decoration:none;display:inline-block;margin-top:10px}
+</style></head><body><header>⚡ Электрик кызматтары</header>
+<div class="container" id="list"></div><script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "СЕНИН_KEY",
+  authDomain: "СЕНИН",
+  databaseURL: "СЕНИН",
+  projectId: "СЕНИН"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const list = document.getElementById("list");
+
+onValue(ref(db, "masters"), (snapshot) => {
+  list.innerHTML = "";
+  snapshot.forEach(child => {
+    let m = child.val();
+
+    list.innerHTML += `
+    <div class="card">
+      <img src="${m.img}">
+      <div class="title">${m.name}</div>
+      <div class="city">📍 ${m.city}</div>
+      <div class="work">🛠 ${m.work}</div>
+      <a class="whatsapp" href="https://wa.me/${m.phone}">WhatsApp</a>
+    </div>`;
+  });
+});
+</script></body>
 </html>
