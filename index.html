@@ -1,169 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="ky">
 <head>
 <meta charset="UTF-8">
-<title>AI Police Security</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X O Game</title>
 
 <style>
-body{
-margin:0;
-background:#000;
-color:#00f7ff;
-font-family:Arial;
-text-align:center;
-transition:0.3s;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: white;
+  text-align: center;
 }
 
-h1{margin-top:10px;}
-
-video{
-width:95%;
-margin-top:10px;
-border:2px solid #00f7ff;
-border-radius:10px;
+h1 {
+  margin-top: 25px;
+  font-size: 28px;
+  color: #38bdf8;
 }
 
-.status{
-margin-top:15px;
-font-size:22px;
+#status {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #facc15;
 }
 
-.safe{color:#00ff88;}
-.warn{color:#ffcc00;}
-.danger{color:#ff0040;}
-
-.flash{
-background:white !important;
-color:black !important;
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 90px);
+  gap: 10px;
+  justify-content: center;
+  margin-top: 30px;
 }
 
-button{
-margin-top:10px;
-padding:12px;
-width:80%;
-background:#00f7ff;
-border:none;
-font-weight:bold;
-border-radius:6px;
+.cell {
+  width: 90px;
+  height: 90px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 38px;
+  cursor: pointer;
+  transition: 0.2s;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+.cell:hover {
+  transform: scale(1.1);
+  background: rgba(255,255,255,0.15);
+}
+
+button {
+  margin-top: 25px;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 10px;
+  background: #38bdf8;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #0ea5e9;
+  transform: scale(1.05);
+}
+
+.win {
+  color: #22c55e;
+  font-size: 22px;
+  animation: pop 0.4s ease-in-out;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 </style>
 </head>
 
 <body>
 
-<h1>🚨 POLICE AI SECURITY</h1>
+<h1>🎮 X O GAME</h1>
+<h2 id="status">Player X баштайт</h2>
 
-<video id="video" autoplay></video>
+<div class="board" id="board"></div>
 
-<div id="status" class="status safe">ЗОНА ТИХАЯ 🟢</div>
-
-<button onclick="startCam()">START CAMERA</button>
+<button onclick="resetGame()">🔄 Кайра баштоо</button>
 
 <script>
+let currentPlayer = "X";
+let cells = Array(9).fill("");
+let gameOver = false;
 
-let video=document.getElementById("video");
-let status=document.getElementById("status");
+const board = document.getElementById("board");
+const status = document.getElementById("status");
 
-let lastFrame=null;
-let active=false;
-
-// 🤖 ROBOT VOICE (strong)
-function robotSpeak(text){
-let msg=new SpeechSynthesisUtterance(text);
-msg.lang="ru-RU";
-msg.rate=0.75;
-msg.pitch=0.2;
-msg.volume=1;
-speechSynthesis.speak(msg);
+function createBoard() {
+  board.innerHTML = "";
+  cells.forEach((val, i) => {
+    const div = document.createElement("div");
+    div.classList.add("cell");
+    div.innerText = val;
+    div.addEventListener("click", () => makeMove(i));
+    board.appendChild(div);
+  });
 }
 
-// 🚨 POLICE SIREN
-function siren(){
-let audio=new Audio("https://actions.google.com/sounds/v1/alarms/police_siren.ogg");
-audio.volume = 1;
-audio.play();
+function makeMove(i) {
+  if (cells[i] !== "" || gameOver) return;
+
+  cells[i] = currentPlayer;
+
+  if (checkWin()) {
+    status.innerHTML = "🎉 <span class='win'>Player " + currentPlayer + " утту!</span>";
+    gameOver = true;
+    createBoard();
+    return;
+  }
+
+  if (!cells.includes("")) {
+    status.innerText = "🤝 Ничья!";
+    gameOver = true;
+    createBoard();
+    return;
+  }
+
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+  status.innerText = "Player " + currentPlayer + " кезеги";
+
+  createBoard();
 }
 
-// 📷 CAMERA
-function startCam(){
-navigator.mediaDevices.getUserMedia({video:true})
-.then(stream=>{
-video.srcObject=stream;
-detect();
-});
+function checkWin() {
+  const winPatterns = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  return winPatterns.some(p =>
+    cells[p[0]] &&
+    cells[p[0]] === cells[p[1]] &&
+    cells[p[1]] === cells[p[2]]
+  );
 }
 
-// 👁️ MOTION DETECT
-function detect(){
-
-let canvas=document.createElement("canvas");
-let ctx=canvas.getContext("2d");
-
-setInterval(()=>{
-
-if(video.videoWidth===0) return;
-
-canvas.width=video.videoWidth;
-canvas.height=video.videoHeight;
-
-ctx.drawImage(video,0,0);
-
-let frame=ctx.getImageData(0,0,canvas.width,canvas.height);
-
-if(lastFrame){
-
-let diff=0;
-
-for(let i=0;i<frame.data.length;i+=70){
-diff += Math.abs(frame.data[i]-lastFrame.data[i]);
+function resetGame() {
+  cells = Array(9).fill("");
+  currentPlayer = "X";
+  gameOver = false;
+  status.innerText = "Player X баштайт";
+  createBoard();
 }
 
-// 🚨 STRONG ALERT
-if(diff>20000 && !active){
-active=true;
-
-triggerAlarm();
-}
-
-}
-
-lastFrame=frame;
-
-},1000);
-}
-
-// 🚨 FULL ALARM SEQUENCE
-function triggerAlarm(){
-
-document.body.classList.add("flash");
-
-status.innerText="🚨 ОБЪЕКТ ОБНАРУЖЕН!";
-status.className="status danger";
-
-// 🚨 1) SIREN
-siren();
-
-// 🤖 2) ROBOT VOICE (multi step)
-robotSpeak("Внимание! Вы вошли в охраняемую зону.");
-
-setTimeout(()=>{
-robotSpeak("Система безопасности активирована. Ведётся запись.");
-},3000);
-
-setTimeout(()=>{
-robotSpeak("Немедленно покиньте территорию. Это последнее предупреждение.");
-},6000);
-
-// reset
-setTimeout(()=>{
-document.body.classList.remove("flash");
-status.innerText="ЗОНА ТИХАЯ 🟢";
-status.className="status safe";
-active=false;
-},9000);
-
-}
-
+createBoard();
 </script>
 
 </body>
